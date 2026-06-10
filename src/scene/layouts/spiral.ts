@@ -25,6 +25,22 @@ function hash(i: number, salt: number): number {
   return ((h >>> 8) & 0xffff) / 0xffff; // [0,1)
 }
 
+/** A point on an arm — shared by the star layout and the nebula wisps so the
+ * clouds trace exactly where the stars live. */
+export function armPoint(
+  year: number,
+  universe: number,
+  j1: number,
+  j2: number,
+): [number, number, number] {
+  const t = (year - YEAR_MIN) / (YEAR_MAX - YEAR_MIN);
+  const arm = universe === 0 ? 0 : Math.PI;
+  const angle = arm + t * WINDS + (j1 - 0.5) * 0.22;
+  const radius =
+    CORE_R + (RIM_R - CORE_R) * Math.pow(t, 0.8) + (j2 - 0.5) * ARM_SPREAD * 2;
+  return [Math.cos(angle) * radius, 0, Math.sin(angle) * radius];
+}
+
 export function galaxySpiral(stars: StarFields): Float32Array {
   const n = stars.count;
   const out = new Float32Array(n * 3);
@@ -46,11 +62,7 @@ export function galaxySpiral(stars: StarFields): Float32Array {
       continue;
     }
 
-    const t = (year - YEAR_MIN) / (YEAR_MAX - YEAR_MIN); // 0..1 along arm
-    const arm = stars.universe[i] === 0 ? 0 : Math.PI; // Marvel arm vs DC arm
-    const angle = arm + t * WINDS + (j1 - 0.5) * 0.22;
-    const radius = CORE_R + (RIM_R - CORE_R) * Math.pow(t, 0.8)
-      + (j2 - 0.5) * ARM_SPREAD * 2;
+    const [x, , z] = armPoint(year, stars.universe[i], j1, j2);
 
     // moral topography: heroes lift, villains sink, neutral/unknown stay flat
     const a = stars.align[i];
@@ -58,9 +70,9 @@ export function galaxySpiral(stars: StarFields): Float32Array {
     const y = lift * (6 + 18 * j3) + (j1 - 0.5) * 6
       + (a === NA_U8 ? (j2 - 0.5) * 10 : 0);
 
-    out[i * 3] = Math.cos(angle) * radius;
+    out[i * 3] = x;
     out[i * 3 + 1] = y;
-    out[i * 3 + 2] = Math.sin(angle) * radius;
+    out[i * 3 + 2] = z;
   }
   return out;
 }

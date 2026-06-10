@@ -18,6 +18,8 @@
   letter-spacing: 0.08em;
 }
 
+.hud-bottom { align-items: flex-end; }
+
 .wordmark {
   color: var(--bone);
   font-size: 14px;
@@ -37,6 +39,74 @@
   color: var(--annot);
 }
 
+/* ---- layout label + sci-fi legend ---- */
+
+.hud-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 420px;
+  text-align: right;
+}
+
+.hud-layout-name {
+  color: var(--bone);
+  letter-spacing: 0.2em;
+}
+
+.hud-legend {
+  color: var(--annot);
+  font-size: 11px;
+  line-height: 1.5;
+  position: relative;
+}
+
+/* glitch-in: rgb-split slices that settle into clean text */
+.glitch {
+  animation: glitch-settle 1.6s steps(14) both;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+.glitch::before {
+  color: var(--coral);
+  animation: glitch-slice-a 1.6s steps(14) both;
+}
+.glitch::after {
+  color: #4595ff;
+  animation: glitch-slice-b 1.6s steps(14) both;
+}
+
+@keyframes glitch-settle {
+  0% { opacity: 0; transform: translateX(2px); }
+  10% { opacity: 1; transform: translateX(-1px); }
+  30% { transform: translateX(1px); }
+  50% { transform: none; }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes glitch-slice-a {
+  0% { opacity: 0.9; clip-path: inset(10% 0 55% 0); transform: translateX(-3px); }
+  20% { opacity: 0.7; clip-path: inset(60% 0 12% 0); transform: translateX(3px); }
+  40% { opacity: 0.5; clip-path: inset(30% 0 40% 0); transform: translateX(-2px); }
+  60% { opacity: 0.25; clip-path: inset(75% 0 5% 0); transform: translateX(1px); }
+  80%, 100% { opacity: 0; clip-path: inset(0 0 0 0); transform: none; }
+}
+@keyframes glitch-slice-b {
+  0% { opacity: 0.9; clip-path: inset(55% 0 10% 0); transform: translateX(3px); }
+  20% { opacity: 0.7; clip-path: inset(8% 0 65% 0); transform: translateX(-3px); }
+  40% { opacity: 0.5; clip-path: inset(45% 0 25% 0); transform: translateX(2px); }
+  60% { opacity: 0.25; clip-path: inset(2% 0 80% 0); transform: translateX(-1px); }
+  80%, 100% { opacity: 0; clip-path: inset(0 0 0 0); transform: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .cursor { animation: none; }
+  .glitch { animation: none; }
+  .glitch::before, .glitch::after { display: none; }
 }
