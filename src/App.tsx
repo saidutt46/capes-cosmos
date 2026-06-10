@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { loadSurvey, type StarFields } from './data/parser';
-import { StarField, type LayoutName } from './scene/field';
+import { StarField, type LayoutName, type Lens } from './scene/field';
 import { Hud } from './ui/Hud';
 import { Verbs, designationOf } from './ui/Verbs';
 import { DesignPage } from './ui/DesignPage';
+import { MethodologyPage } from './ui/MethodologyPage';
 
 function parseDeepLink(): number {
   const m = window.location.pathname.match(/^\/star\/PS-(\d{1,5})$/);
@@ -13,8 +14,9 @@ function parseDeepLink(): number {
 }
 
 export default function App() {
-  // hidden, never-linked design reference (no router needed for one path)
+  // two static pages; everything else is the survey (no router needed)
   if (window.location.pathname === '/design') return <DesignPage />;
+  if (window.location.pathname === '/methodology') return <MethodologyPage />;
   return <Survey />;
 }
 
@@ -27,6 +29,7 @@ function Survey() {
   const [error, setError] = useState<string | null>(null);
   const [layout, setLayout] = useState<LayoutName>('spiral');
   const [showNames, setShowNames] = useState(true);
+  const [lens, setLens] = useState<Lens>({ field: 'none', value: 0 });
   const [ignite, setIgnite] = useState(0);
   const igniteRef = useRef(0);
 
@@ -78,6 +81,11 @@ function Survey() {
     setShowNames(on);
   }, []);
 
+  const onLens = useCallback((l: Lens) => {
+    fieldRef.current?.setLens(l);
+    setLens(l);
+  }, []);
+
   const onLockChange = useCallback((index: number) => {
     const path = index >= 0 ? `/star/${designationOf(index)}` : '/';
     if (window.location.pathname !== path) window.history.pushState(null, '', path);
@@ -94,6 +102,8 @@ function Survey() {
         names={showNames}
         onNames={onNames}
         ignite={ignite}
+        lens={lens}
+        onLens={onLens}
       />
       {field && stars && (
         <Verbs field={field} stars={stars} names={names} onLockChange={onLockChange} />

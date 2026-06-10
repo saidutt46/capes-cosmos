@@ -9,6 +9,15 @@
  */
 import * as THREE from 'three';
 import gsap from 'gsap';
+import {
+  BloomEffect,
+  EffectComposer,
+  EffectPass,
+  NoiseEffect,
+  RenderPass,
+  VignetteEffect,
+  BlendFunction,
+} from 'postprocessing';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { StarFields } from '../data/parser';
 import { NA_APPEARANCES, NA_YEAR } from '../data/parser';
@@ -36,6 +45,13 @@ export interface LockInfo {
   cohort: number[];
 }
 
+/** lens = dim everything that doesn't match one data facet */
+export type LensField = 'none' | 'fate' | 'class' | 'universe';
+export interface Lens {
+  field: LensField;
+  value: number; // code within the facet's category table
+}
+
 interface CameraPreset {
   pos: [number, number, number];
   target: [number, number, number];
@@ -60,6 +76,7 @@ const VERT = /* glsl */ `
   attribute float aTwinkle;
   attribute float aIndex;
   attribute float aCohort;
+  attribute vec3 aFilter; // (universe, align|99, alive) for the lenses
   uniform float uTime;
   uniform float uMix;
   uniform float uIgnite;
@@ -69,6 +86,9 @@ const VERT = /* glsl */ `
   uniform float uSweepR;
   uniform vec3 uSweepOrigin;
   uniform float uExposure;
+  uniform float uLensField; // 0 none · 1 fate · 2 class · 3 universe
+  uniform float uLensValue;
+  uniform float uMotion; // 0 under prefers-reduced-motion
   varying vec3 vColor;
   varying vec3 vRing;
   varying float vFlare;
@@ -101,7 +121,14 @@ const VERT = /* glsl */ `
     float keep = max(isLock, aCohort);
     float dim = 1.0 - uDim * (1.0 - keep);
 
-    float tw = 1.0 + 0.18 * sin(uTime * 1.7 + aTwinkle * 6.28318);
+    // lens: non-matching stars fall to a faint substrate (never deleted)
+    if (uLensField > 0.5) {
+      float val = uLensField < 1.5 ? aFilter.z : (uLensField < 2.5 ? aFilter.y : aFilter.x);
+      float match = step(abs(val - uLensValue), 0.5);
+      dim *= mix(0.10, 1.0, max(match, max(isLock, isHover)));
+    }
+
+    float tw = 1.0 + 0.18 * uMotion * sin(uTime * 1.7 + aTwinkle * 6.28318);
     float size = aSize * tw * (1.0 + ex * 1.5);
     size *= 1.0 + isHover * 0.55 + isLock * 0.9;
 
@@ -196,10 +223,21 @@ export class StarField {
   private v3 = new THREE.Vector3();
   private ray = new THREE.Raycaster();
 
+  /** prefers-reduced-motion: instant ignition, short crossfade morphs, no twinkle/spin */
+  readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /** coarse pointers (phones/tablets): skip post FX, lower DPR cap */
+  readonly lowPower = window.matchMedia('(pointer: coarse)').matches;
+  private composer: EffectComposer | null = null;
+
+  /** clamp animation durations under reduced motion */
+  private dur(seconds: number): number {
+    return this.reducedMotion ? Math.min(seconds, 0.4) : seconds;
+  }
+
   constructor(canvas: HTMLCanvasElement, stars: StarFields) {
     this.stars = stars;
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, this.lowPower ? 1.5 : 2));
     this.renderer.setClearColor('#08090d');
 
     this.camera = new THREE.PerspectiveCamera(55, 1, 0.1, 6000);
@@ -224,10 +262,12 @@ export class StarField {
     this.buildAtmosphere();
     this.buildPoints(stars);
     this.picker = new GpuPicker(this.geo);
+    this.buildPost();
     this.bindPointer(canvas);
     this.onResize();
     window.addEventListener('resize', this.onResize);
     window.addEventListener('keydown', this.onKey);
+    if (this.reducedMotion) this.spin = 0;
     this.ignite();
     this.loop();
 
@@ -236,6 +276,23 @@ export class StarField {
   }
 
   // ---------- construction ----------
+
+  /** halation + grain + vignette — the survey-plate finish (skipped on low power) */
+  private buildPost() {
+    if (this.lowPower) return;
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(new RenderPass(this.scene, this.camera));
+    const bloom = new BloomEffect({
+      intensity: 0.72,
+      luminanceThreshold: 0.32, // stars bloom; the nebula haze must not
+      luminanceSmoothing: 0.22,
+      mipmapBlur: true,
+    });
+    const grain = new NoiseEffect({ blendFunction: BlendFunction.OVERLAY, premultiply: true });
+    grain.blendMode.opacity.value = 0.28;
+    const vignette = new VignetteEffect({ darkness: 0.46, offset: 0.28 });
+    this.composer.addPass(new EffectPass(this.camera, bloom, grain, vignette));
+  }
 
   private buildAtmosphere() {
     this.bg = makeBackground();
@@ -255,6 +312,7 @@ export class StarField {
     const flares = new Float32Array(n);
     const twinkles = new Float32Array(n);
     const indices = new Float32Array(n);
+    const filters = new Float32Array(n * 3);
 
     const ringColor = new THREE.Color();
     const GOLDEN = 0.6180339887498949;
@@ -278,6 +336,10 @@ export class StarField {
       indices[i] = i;
       this.delays[i] =
         stars.year[i] === NA_YEAR ? 1 : (stars.year[i] - 1935) / (2013 - 1935);
+      // lens facets; 99 = unrecorded, matches nothing, dims honestly
+      filters[i * 3] = stars.universe[i];
+      filters[i * 3 + 1] = stars.align[i] === 255 ? 99 : stars.align[i];
+      filters[i * 3 + 2] = stars.alive[i] === 255 ? 99 : stars.alive[i];
     }
 
     this.geo = new THREE.BufferGeometry();
@@ -291,6 +353,7 @@ export class StarField {
     this.geo.setAttribute('aFlare', new THREE.BufferAttribute(flares, 1));
     this.geo.setAttribute('aTwinkle', new THREE.BufferAttribute(twinkles, 1));
     this.geo.setAttribute('aIndex', new THREE.BufferAttribute(indices, 1));
+    this.geo.setAttribute('aFilter', new THREE.BufferAttribute(filters, 3));
     this.cohortAttr = new THREE.BufferAttribute(new Float32Array(n), 1);
     this.geo.setAttribute('aCohort', this.cohortAttr);
     this.geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 3000);
@@ -308,6 +371,9 @@ export class StarField {
         uSweepR: { value: -1 },
         uSweepOrigin: { value: new THREE.Vector3() },
         uExposure: { value: 0 },
+        uLensField: { value: 0 },
+        uLensValue: { value: 0 },
+        uMotion: { value: this.reducedMotion ? 0 : 1 },
       },
       transparent: true,
       depthWrite: false,
@@ -346,6 +412,12 @@ export class StarField {
 
   private ignite() {
     const u = this.starMat.uniforms.uIgnite;
+    if (this.reducedMotion) {
+      u.value = 1;
+      // constructor runs before React subscribes — defer past this task
+      queueMicrotask(() => this.emit('ignite', { progress: 1 }));
+      return;
+    }
     gsap.to(u, {
       value: 1,
       duration: 2.6,
@@ -353,6 +425,17 @@ export class StarField {
       onUpdate: () => this.emit('ignite', { progress: u.value as number }),
       onComplete: () => this.emit('ignite', { progress: 1 }),
     });
+  }
+
+  // ---------- lenses ----------
+
+  setLens(lens: Lens) {
+    const fieldCode = { none: 0, fate: 1, class: 2, universe: 3 }[lens.field];
+    gsap.to(this.starMat.uniforms.uLensField, {
+      value: fieldCode,
+      duration: 0.01,
+    });
+    this.starMat.uniforms.uLensValue.value = lens.value;
   }
 
   // ---------- events ----------
@@ -569,11 +652,11 @@ export class StarField {
     this.controls.enabled = false;
     gsap.to(this.camera.position, {
       x: camPos.x, y: camPos.y, z: camPos.z,
-      duration: 1.4, ease: 'power3.inOut',
+      duration: this.dur(1.4), ease: 'power3.inOut',
     });
     gsap.to(this.controls.target, {
       x: target.x, y: target.y, z: target.z,
-      duration: 1.4, ease: 'power3.inOut',
+      duration: this.dur(1.4), ease: 'power3.inOut',
       onComplete: () => (this.controls.enabled = true),
     });
 
@@ -603,11 +686,11 @@ export class StarField {
     this.controls.enabled = false;
     gsap.to(this.camera.position, {
       x: preset.pos[0], y: preset.pos[1], z: preset.pos[2],
-      duration: 1.2, ease: 'power3.inOut',
+      duration: this.dur(1.2), ease: 'power3.inOut',
     });
     gsap.to(this.controls.target, {
       x: preset.target[0], y: preset.target[1], z: preset.target[2],
-      duration: 1.2, ease: 'power3.inOut',
+      duration: this.dur(1.2), ease: 'power3.inOut',
       onComplete: () => (this.controls.enabled = true),
     });
 
@@ -709,7 +792,7 @@ export class StarField {
     this.currentLayout = name;
 
     const preset = CAMERA_PRESETS[name];
-    const dur = MORPH_SECONDS;
+    const dur = this.dur(MORPH_SECONDS);
 
     gsap.to(this.starMat.uniforms.uMix, {
       value: 1, duration: dur, ease: 'power2.inOut',
@@ -754,6 +837,7 @@ export class StarField {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
+    this.composer?.setSize(w, h);
   };
 
   private loop = () => {
@@ -768,7 +852,8 @@ export class StarField {
     this.bg.update(t);
     this.wisps.update(t);
     this.controls.update();
-    this.renderer.render(this.scene, this.camera);
+    if (this.composer) this.composer.render();
+    else this.renderer.render(this.scene, this.camera);
 
     if (this.labels.enabled && this.frame % 3 === 0 && this.lockedIndex < 0) {
       this.labels.update(this.collectLabelCandidates());
@@ -801,6 +886,7 @@ export class StarField {
     this.controls.dispose();
     this.labels.dispose();
     this.picker.dispose();
+    this.composer?.dispose();
     this.scene.traverse((o) => {
       if (o instanceof THREE.Mesh || o instanceof THREE.Points || o instanceof THREE.LineSegments) {
         o.geometry.dispose();

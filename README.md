@@ -18,6 +18,23 @@ npm run dev        # http://localhost:5180  (5173 belongs to switchboard on this
 ```
 
 `/design` — hidden FIELD MANUAL (palette, type, motion, the rules). Never linked.
+`/methodology` — the colophon: data provenance, what the sky encodes, what's deliberately absent.
+`/star/PS-00001` — deep link straight into any character's dossier.
+
+## The instrument
+
+- **Layout dial** — four skies, morphing all 23,272 stars in a year-staggered
+  ripple: Galaxy Spiral · Expanding Universe · Time Tunnel · Constellations.
+- **SWEEP** — click the void: a wavefront crosses the field and the survey
+  answers with a sector census and era annotation.
+- **LOCK** — click a star: the camera flies in, the field dims, ring gauges
+  unfold around the star, cohort hairlines connect its debut-year kin, and the
+  dossier opens (luminosity percentile, reality, spectral class). Esc releases.
+- **EXPOSE** — press and hold: long-exposure develops the ~6,200 characters
+  who appeared exactly once. Release, and they fade back into the dark.
+- **LENSES** (left edge) — FATE / CLASS / UNIVERSE dim everything that doesn't
+  match. **DESIGNATIONS** (top right) — distance-culled floating names.
+- Honors `prefers-reduced-motion`; coarse-pointer devices skip post FX.
 
 ## Verify
 

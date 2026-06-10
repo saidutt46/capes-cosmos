@@ -69,6 +69,45 @@
 
 .names-btn { font-size: 10px; }
 
+/* ---- lens bar (left edge, vertical) ---- */
+
+.lens-bar {
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  pointer-events: auto;
+  z-index: 12;
+}
+
+.lens-group { display: flex; flex-direction: column; gap: 2px; }
+
+.lens-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  color: var(--annot);
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.lens-btn {
+  text-align: left;
+  font-size: 10px;
+  padding: 4px 8px;
+}
+
+.hud-link {
+  color: var(--annot);
+  text-decoration: none;
+  pointer-events: auto;
+  border-bottom: 1px solid transparent;
+}
+.hud-link:hover { color: var(--bone); border-bottom-color: var(--coral); }
+
 /* ---- layout label + sci-fi legend ---- */
 
 .hud-layout {

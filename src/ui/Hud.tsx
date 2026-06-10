@@ -1,6 +1,13 @@
 import type { StarFields } from '../data/parser';
-import type { LayoutName } from '../scene/field';
+import type { LayoutName, Lens } from '../scene/field';
 import './hud.css';
+
+/** lens facets: label → (field, category code) */
+const LENSES: { group: string; field: Lens['field']; options: [string, number][] }[] = [
+  { group: 'FATE', field: 'fate', options: [['LIVING', 0], ['DECEASED', 1]] },
+  { group: 'CLASS', field: 'class', options: [['GOOD', 0], ['NEUTRAL', 1], ['BAD', 2]] },
+  { group: 'UNIVERSE', field: 'universe', options: [['MARVEL', 0], ['DC', 1]] },
+];
 
 const LAYOUTS: { id: LayoutName; label: string }[] = [
   { id: 'spiral', label: 'GALAXY SPIRAL' },
@@ -28,9 +35,11 @@ interface HudProps {
   names: boolean;
   onNames: (on: boolean) => void;
   ignite: number;
+  lens: Lens;
+  onLens: (l: Lens) => void;
 }
 
-export function Hud({ stars, error, layout, onLayout, names, onNames, ignite }: HudProps) {
+export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, lens, onLens }: HudProps) {
   return (
     <div className="hud">
       <header className="hud-bar">
@@ -60,6 +69,29 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite }: 
         </button>
       </header>
 
+      <nav className="lens-bar" data-testid="lens-bar">
+        {LENSES.map((g) => (
+          <span key={g.group} className="lens-group">
+            <span className="lens-label">{g.group}</span>
+            {g.options.map(([label, code]) => {
+              const active = lens.field === g.field && lens.value === code;
+              return (
+                <button
+                  key={label}
+                  className={`dial-btn lens-btn${active ? ' active' : ''}`}
+                  data-testid={`lens-${label.toLowerCase()}`}
+                  onClick={() =>
+                    onLens(active ? { field: 'none', value: 0 } : { field: g.field, value: code })
+                  }
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </span>
+        ))}
+      </nav>
+
       <footer className="hud-bar hud-bottom">
         <span data-testid="status" className="hud-note">
           {error
@@ -69,6 +101,10 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite }: 
                 ? `IGNITING — ${Math.floor(stars.count * ignite).toLocaleString()} OBJECTS`
                 : `${stars.count.toLocaleString()} OBJECTS · ${stars.meta.categories.reality.length} REALITIES · 1935–2013`
               : 'ACQUIRING SURVEY DATA…'}
+          {'  '}
+          <a className="hud-link" href="/methodology">
+            · METHODOLOGY
+          </a>
         </span>
         <span className="hud-layout">
           <span className="hud-layout-name">
