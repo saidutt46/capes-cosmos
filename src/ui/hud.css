@@ -39,6 +39,36 @@
   color: var(--annot);
 }
 
+/* ---- the layout dial ---- */
+
+.dial {
+  display: flex;
+  gap: 4px;
+  pointer-events: auto;
+}
+
+.dial-btn {
+  pointer-events: auto;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--annot);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: color var(--dur-ui) ease, border-color var(--dur-ui) ease;
+}
+
+.dial-btn:hover { color: var(--bone); }
+
+.dial-btn.active {
+  color: var(--coral);
+  border-color: color-mix(in srgb, var(--coral) 45%, transparent);
+}
+
+.names-btn { font-size: 10px; }
+
 /* ---- layout label + sci-fi legend ---- */
 
 .hud-layout {

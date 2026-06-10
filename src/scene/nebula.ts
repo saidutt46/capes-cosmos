@@ -93,12 +93,13 @@ const GLOW_VERT = /* glsl */ `
 
 const GLOW_FRAG = /* glsl */ `
   varying vec2 vUv;
+  uniform float uFade;
   void main() {
     float d = length(vUv) * 2.0;
     float core = exp(-d * 5.5);
     float bloom = exp(-d * 1.8) * 0.35;
     vec3 warm = vec3(1.0, 0.85, 0.62); // old starlight, not UI coral
-    gl_FragColor = vec4(warm * (core + bloom), core + bloom);
+    gl_FragColor = vec4(warm * (core + bloom), (core + bloom)) * uFade;
   }
 `;
 
@@ -106,6 +107,7 @@ export function makeCoreGlow(size = 130): THREE.Mesh {
   const mat = new THREE.ShaderMaterial({
     vertexShader: GLOW_VERT,
     fragmentShader: GLOW_FRAG,
+    uniforms: { uFade: { value: 1 } },
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
@@ -135,10 +137,11 @@ const WISP_VERT = /* glsl */ `
 const WISP_FRAG = /* glsl */ `
   varying vec3 vColor;
   varying float vPulse;
+  uniform float uFade;
   void main() {
     float d = length(gl_PointCoord - 0.5) * 2.0;
     if (d > 1.0) discard;
-    float a = exp(-d * 3.0) * 0.06 * vPulse;
+    float a = exp(-d * 3.0) * 0.06 * vPulse * uFade;
     gl_FragColor = vec4(vColor, a);
   }
 `;
@@ -193,7 +196,7 @@ export function makeWisps(
   const mat = new THREE.ShaderMaterial({
     vertexShader: WISP_VERT,
     fragmentShader: WISP_FRAG,
-    uniforms: { uTime: { value: 0 } },
+    uniforms: { uTime: { value: 0 }, uFade: { value: 1 } },
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
