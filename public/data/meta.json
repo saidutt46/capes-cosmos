@@ -1,0 +1,121 @@
+{
+  "count": 23272,
+  "endianness": "little",
+  "byteLength": 232720,
+  "fields": [
+    {
+      "name": "universe",
+      "type": "u8",
+      "offset": 0,
+      "length": 23272
+    },
+    {
+      "name": "align",
+      "type": "u8",
+      "offset": 23272,
+      "length": 23272
+    },
+    {
+      "name": "sex",
+      "type": "u8",
+      "offset": 46544,
+      "length": 23272
+    },
+    {
+      "name": "alive",
+      "type": "u8",
+      "offset": 69816,
+      "length": 23272
+    },
+    {
+      "name": "identity",
+      "type": "u8",
+      "offset": 93088,
+      "length": 23272
+    },
+    {
+      "name": "reality_id",
+      "type": "u8",
+      "offset": 116360,
+      "length": 23272
+    },
+    {
+      "name": "year",
+      "type": "u16",
+      "offset": 139632,
+      "length": 23272
+    },
+    {
+      "name": "appearances",
+      "type": "u16",
+      "offset": 186176,
+      "length": 23272
+    }
+  ],
+  "na": {
+    "u8": 255,
+    "year": 0,
+    "appearances": 65535
+  },
+  "categories": {
+    "universe": [
+      "Marvel",
+      "DC"
+    ],
+    "align": [
+      "Good",
+      "Neutral",
+      "Bad"
+    ],
+    "sex": [
+      "Male",
+      "Female",
+      "Other"
+    ],
+    "alive": [
+      "Living",
+      "Deceased"
+    ],
+    "identity": [
+      "Secret",
+      "Public",
+      "No Dual",
+      "Known to Authorities",
+      "Unknown"
+    ],
+    "reality": [
+      "Earth-616",
+      "New Earth",
+      "Earth-One",
+      "Earth-Two",
+      "Prime Earth",
+      "Alternate"
+    ]
+  },
+  "realities": [
+    {
+      "name": "Earth-616",
+      "count": 16345
+    },
+    {
+      "name": "New Earth",
+      "count": 6829
+    },
+    {
+      "name": "Earth-One",
+      "count": 43
+    },
+    {
+      "name": "Earth-Two",
+      "count": 9
+    },
+    {
+      "name": "Prime Earth",
+      "count": 8
+    },
+    {
+      "name": "Alternate",
+      "count": 38
+    }
+  ]
+}

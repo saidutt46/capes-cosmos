@@ -1,0 +1,38 @@
+/* PAPER SKY — design tokens (data-noir observatory)
+   Discipline: Marvel red / DC blue exist ONLY as light inside the canvas.
+   UI chrome never touches them — chrome is void / bone / coral. */
+:root {
+  /* surfaces */
+  --void: #08090d;
+  --ink: #11141a;
+
+  /* text */
+  --bone: #e9e2d0;
+  --annot: #8a8e98;
+
+  /* the single accent — interactive states only */
+  --coral: #ff5c49;
+
+  /* type — Fraunces (variable: wght 300-900, opsz 9-144) for display,
+     Plex Mono as the instrument voice, Inter Tight for prose */
+  --font-display: 'Fraunces', serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-body: 'Inter Tight', system-ui, sans-serif;
+
+  /* motion */
+  --ease-weighty: cubic-bezier(0.16, 1, 0.3, 1); /* expo.out feel */
+  --dur-camera: 800ms;
+  --dur-ui: 350ms;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  background: var(--void);
+  color: var(--bone);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+::selection { background: var(--coral); color: var(--void); }

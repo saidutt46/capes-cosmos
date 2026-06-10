@@ -1,0 +1,82 @@
+.manual {
+  height: 100%;
+  overflow-y: auto;
+  padding: 64px clamp(24px, 8vw, 120px) 120px;
+  background:
+    radial-gradient(ellipse at 30% -10%, #0d1018 0%, var(--void) 55%);
+}
+
+.manual section { margin-top: 72px; max-width: 880px; }
+
+.manual-head .display {
+  font-family: var(--font-display);
+  font-weight: 560;
+  font-size: clamp(56px, 9vw, 128px);
+  letter-spacing: -0.015em;
+  line-height: 0.95;
+  margin: 12px 0;
+}
+
+.mono { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.06em; }
+.dim { color: var(--annot); }
+.coral { color: var(--coral); }
+.body { font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--bone); }
+
+.section-label {
+  color: var(--coral);
+  margin-bottom: 24px;
+  letter-spacing: 0.2em;
+}
+
+.rule { max-width: 640px; margin-bottom: 28px; color: var(--annot); }
+.rule em { color: var(--bone); font-style: normal; }
+
+.swatch-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 40px; }
+.swatch { width: 150px; }
+.chip {
+  height: 88px;
+  border-radius: 2px;
+  border: 1px solid #1d212a;
+  margin-bottom: 10px;
+}
+.chip.glow { box-shadow: 0 0 32px -4px currentColor; border: none; }
+.swatch figcaption { font-size: 11px; line-height: 1.5; }
+
+.specimen { margin-bottom: 44px; }
+.spec-display {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 6vw, 84px);
+  font-weight: 400;
+  font-variation-settings: 'opsz' 144;
+  line-height: 1.05;
+  margin-top: 6px;
+}
+.spec-display.heavy { font-weight: 750; letter-spacing: -0.01em; }
+.spec-mono { margin-top: 10px; line-height: 1.8; color: var(--bone); }
+.spec-body { margin-top: 10px; max-width: 560px; }
+
+.ease-demo {
+  width: min(640px, 100%);
+  height: 40px;
+  background: var(--ink);
+  border-radius: 2px;
+  position: relative;
+  margin-bottom: 10px;
+}
+.ease-dot {
+  position: absolute;
+  top: 14px; left: 12px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--coral);
+  transition: transform 1.8s var(--ease-weighty);
+}
+.ease-demo:hover .ease-dot { transform: translateX(min(580px, 80vw)); }
+
+.verbs { list-style: none; line-height: 2.4; color: var(--bone); }
+
+.manual-foot { margin-top: 96px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ease-dot { transition: none; }
+}

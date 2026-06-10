@@ -1,0 +1,701 @@
+{
+  "totals": {
+    "characters": 23272,
+    "marvel": 16376,
+    "dc": 6896,
+    "with_year": 22388,
+    "deceased_pct": 23.5,
+    "year_min": 1935,
+    "year_max": 2013,
+    "appearances_max": 4043
+  },
+  "debuts_per_year": [
+    {
+      "year": 1935,
+      "Marvel": 0,
+      "DC": 1
+    },
+    {
+      "year": 1936,
+      "Marvel": 0,
+      "DC": 9
+    },
+    {
+      "year": 1937,
+      "Marvel": 0,
+      "DC": 4
+    },
+    {
+      "year": 1938,
+      "Marvel": 0,
+      "DC": 10
+    },
+    {
+      "year": 1939,
+      "Marvel": 69,
+      "DC": 18
+    },
+    {
+      "year": 1940,
+      "Marvel": 221,
+      "DC": 64
+    },
+    {
+      "year": 1941,
+      "Marvel": 207,
+      "DC": 61
+    },
+    {
+      "year": 1942,
+      "Marvel": 244,
+      "DC": 52
+    },
+    {
+      "year": 1943,
+      "Marvel": 198,
+      "DC": 14
+    },
+    {
+      "year": 1944,
+      "Marvel": 134,
+      "DC": 15
+    },
+    {
+      "year": 1945,
+      "Marvel": 97,
+      "DC": 7
+    },
+    {
+      "year": 1946,
+      "Marvel": 90,
+      "DC": 9
+    },
+    {
+      "year": 1947,
+      "Marvel": 72,
+      "DC": 20
+    },
+    {
+      "year": 1948,
+      "Marvel": 116,
+      "DC": 20
+    },
+    {
+      "year": 1949,
+      "Marvel": 62,
+      "DC": 6
+    },
+    {
+      "year": 1950,
+      "Marvel": 29,
+      "DC": 9
+    },
+    {
+      "year": 1951,
+      "Marvel": 54,
+      "DC": 12
+    },
+    {
+      "year": 1952,
+      "Marvel": 26,
+      "DC": 5
+    },
+    {
+      "year": 1953,
+      "Marvel": 39,
+      "DC": 1
+    },
+    {
+      "year": 1954,
+      "Marvel": 82,
+      "DC": 7
+    },
+    {
+      "year": 1955,
+      "Marvel": 43,
+      "DC": 12
+    },
+    {
+      "year": 1956,
+      "Marvel": 16,
+      "DC": 13
+    },
+    {
+      "year": 1957,
+      "Marvel": 7,
+      "DC": 13
+    },
+    {
+      "year": 1958,
+      "Marvel": 2,
+      "DC": 15
+    },
+    {
+      "year": 1959,
+      "Marvel": 4,
+      "DC": 34
+    },
+    {
+      "year": 1960,
+      "Marvel": 40,
+      "DC": 39
+    },
+    {
+      "year": 1961,
+      "Marvel": 84,
+      "DC": 50
+    },
+    {
+      "year": 1962,
+      "Marvel": 105,
+      "DC": 42
+    },
+    {
+      "year": 1963,
+      "Marvel": 183,
+      "DC": 40
+    },
+    {
+      "year": 1964,
+      "Marvel": 174,
+      "DC": 31
+    },
+    {
+      "year": 1965,
+      "Marvel": 180,
+      "DC": 50
+    },
+    {
+      "year": 1966,
+      "Marvel": 140,
+      "DC": 61
+    },
+    {
+      "year": 1967,
+      "Marvel": 124,
+      "DC": 56
+    },
+    {
+      "year": 1968,
+      "Marvel": 142,
+      "DC": 61
+    },
+    {
+      "year": 1969,
+      "Marvel": 134,
+      "DC": 23
+    },
+    {
+      "year": 1970,
+      "Marvel": 132,
+      "DC": 28
+    },
+    {
+      "year": 1971,
+      "Marvel": 113,
+      "DC": 65
+    },
+    {
+      "year": 1972,
+      "Marvel": 182,
+      "DC": 61
+    },
+    {
+      "year": 1973,
+      "Marvel": 245,
+      "DC": 20
+    },
+    {
+      "year": 1974,
+      "Marvel": 240,
+      "DC": 17
+    },
+    {
+      "year": 1975,
+      "Marvel": 287,
+      "DC": 39
+    },
+    {
+      "year": 1976,
+      "Marvel": 308,
+      "DC": 45
+    },
+    {
+      "year": 1977,
+      "Marvel": 292,
+      "DC": 52
+    },
+    {
+      "year": 1978,
+      "Marvel": 199,
+      "DC": 60
+    },
+    {
+      "year": 1979,
+      "Marvel": 236,
+      "DC": 29
+    },
+    {
+      "year": 1980,
+      "Marvel": 257,
+      "DC": 36
+    },
+    {
+      "year": 1981,
+      "Marvel": 227,
+      "DC": 119
+    },
+    {
+      "year": 1982,
+      "Marvel": 216,
+      "DC": 111
+    },
+    {
+      "year": 1983,
+      "Marvel": 193,
+      "DC": 161
+    },
+    {
+      "year": 1984,
+      "Marvel": 224,
+      "DC": 141
+    },
+    {
+      "year": 1985,
+      "Marvel": 254,
+      "DC": 115
+    },
+    {
+      "year": 1986,
+      "Marvel": 247,
+      "DC": 132
+    },
+    {
+      "year": 1987,
+      "Marvel": 182,
+      "DC": 254
+    },
+    {
+      "year": 1988,
+      "Marvel": 304,
+      "DC": 286
+    },
+    {
+      "year": 1989,
+      "Marvel": 321,
+      "DC": 266
+    },
+    {
+      "year": 1990,
+      "Marvel": 357,
+      "DC": 175
+    },
+    {
+      "year": 1991,
+      "Marvel": 360,
+      "DC": 145
+    },
+    {
+      "year": 1992,
+      "Marvel": 455,
+      "DC": 178
+    },
+    {
+      "year": 1993,
+      "Marvel": 554,
+      "DC": 209
+    },
+    {
+      "year": 1994,
+      "Marvel": 485,
+      "DC": 230
+    },
+    {
+      "year": 1995,
+      "Marvel": 301,
+      "DC": 172
+    },
+    {
+      "year": 1996,
+      "Marvel": 306,
+      "DC": 188
+    },
+    {
+      "year": 1997,
+      "Marvel": 334,
+      "DC": 189
+    },
+    {
+      "year": 1998,
+      "Marvel": 274,
+      "DC": 143
+    },
+    {
+      "year": 1999,
+      "Marvel": 231,
+      "DC": 179
+    },
+    {
+      "year": 2000,
+      "Marvel": 322,
+      "DC": 152
+    },
+    {
+      "year": 2001,
+      "Marvel": 228,
+      "DC": 99
+    },
+    {
+      "year": 2002,
+      "Marvel": 311,
+      "DC": 115
+    },
+    {
+      "year": 2003,
+      "Marvel": 257,
+      "DC": 103
+    },
+    {
+      "year": 2004,
+      "Marvel": 282,
+      "DC": 102
+    },
+    {
+      "year": 2005,
+      "Marvel": 336,
+      "DC": 159
+    },
+    {
+      "year": 2006,
+      "Marvel": 381,
+      "DC": 303
+    },
+    {
+      "year": 2007,
+      "Marvel": 307,
+      "DC": 188
+    },
+    {
+      "year": 2008,
+      "Marvel": 360,
+      "DC": 211
+    },
+    {
+      "year": 2009,
+      "Marvel": 302,
+      "DC": 226
+    },
+    {
+      "year": 2010,
+      "Marvel": 324,
+      "DC": 279
+    },
+    {
+      "year": 2011,
+      "Marvel": 349,
+      "DC": 155
+    },
+    {
+      "year": 2012,
+      "Marvel": 201,
+      "DC": 5
+    },
+    {
+      "year": 2013,
+      "Marvel": 167,
+      "DC": 1
+    }
+  ],
+  "female_pct_by_decade": [
+    {
+      "decade": 1930,
+      "female_pct": 17.6
+    },
+    {
+      "decade": 1940,
+      "female_pct": 10.9
+    },
+    {
+      "decade": 1950,
+      "female_pct": 16.7
+    },
+    {
+      "decade": 1960,
+      "female_pct": 14.6
+    },
+    {
+      "decade": 1970,
+      "female_pct": 20.7
+    },
+    {
+      "decade": 1980,
+      "female_pct": 29.5
+    },
+    {
+      "decade": 1990,
+      "female_pct": 28.6
+    },
+    {
+      "decade": 2000,
+      "female_pct": 32.0
+    },
+    {
+      "decade": 2010,
+      "female_pct": 31.4
+    }
+  ],
+  "gsm_cumulative": [
+    {
+      "year": 1940,
+      "total": 1
+    },
+    {
+      "year": 1943,
+      "total": 3
+    },
+    {
+      "year": 1948,
+      "total": 4
+    },
+    {
+      "year": 1949,
+      "total": 5
+    },
+    {
+      "year": 1959,
+      "total": 6
+    },
+    {
+      "year": 1960,
+      "total": 7
+    },
+    {
+      "year": 1964,
+      "total": 10
+    },
+    {
+      "year": 1965,
+      "total": 11
+    },
+    {
+      "year": 1972,
+      "total": 12
+    },
+    {
+      "year": 1973,
+      "total": 14
+    },
+    {
+      "year": 1975,
+      "total": 15
+    },
+    {
+      "year": 1976,
+      "total": 18
+    },
+    {
+      "year": 1977,
+      "total": 19
+    },
+    {
+      "year": 1978,
+      "total": 20
+    },
+    {
+      "year": 1979,
+      "total": 22
+    },
+    {
+      "year": 1980,
+      "total": 23
+    },
+    {
+      "year": 1981,
+      "total": 24
+    },
+    {
+      "year": 1982,
+      "total": 26
+    },
+    {
+      "year": 1983,
+      "total": 27
+    },
+    {
+      "year": 1984,
+      "total": 32
+    },
+    {
+      "year": 1985,
+      "total": 33
+    },
+    {
+      "year": 1986,
+      "total": 35
+    },
+    {
+      "year": 1987,
+      "total": 41
+    },
+    {
+      "year": 1988,
+      "total": 47
+    },
+    {
+      "year": 1989,
+      "total": 53
+    },
+    {
+      "year": 1990,
+      "total": 55
+    },
+    {
+      "year": 1991,
+      "total": 59
+    },
+    {
+      "year": 1992,
+      "total": 62
+    },
+    {
+      "year": 1993,
+      "total": 63
+    },
+    {
+      "year": 1994,
+      "total": 68
+    },
+    {
+      "year": 1995,
+      "total": 70
+    },
+    {
+      "year": 1996,
+      "total": 71
+    },
+    {
+      "year": 1997,
+      "total": 76
+    },
+    {
+      "year": 1998,
+      "total": 77
+    },
+    {
+      "year": 2000,
+      "total": 80
+    },
+    {
+      "year": 2001,
+      "total": 88
+    },
+    {
+      "year": 2002,
+      "total": 92
+    },
+    {
+      "year": 2003,
+      "total": 104
+    },
+    {
+      "year": 2004,
+      "total": 108
+    },
+    {
+      "year": 2005,
+      "total": 114
+    },
+    {
+      "year": 2006,
+      "total": 122
+    },
+    {
+      "year": 2007,
+      "total": 124
+    },
+    {
+      "year": 2008,
+      "total": 127
+    },
+    {
+      "year": 2009,
+      "total": 131
+    },
+    {
+      "year": 2010,
+      "total": 136
+    },
+    {
+      "year": 2011,
+      "total": 140
+    },
+    {
+      "year": 2012,
+      "total": 144
+    },
+    {
+      "year": 2013,
+      "total": 148
+    }
+  ],
+  "appearances_hist": [
+    {
+      "bucket": "1",
+      "count": 5812
+    },
+    {
+      "bucket": "2-3",
+      "count": 4708
+    },
+    {
+      "bucket": "4-9",
+      "count": 5544
+    },
+    {
+      "bucket": "10-49",
+      "count": 4417
+    },
+    {
+      "bucket": "50-99",
+      "count": 632
+    },
+    {
+      "bucket": "100-499",
+      "count": 605
+    },
+    {
+      "bucket": "500-999",
+      "count": 60
+    },
+    {
+      "bucket": "1000+",
+      "count": 43
+    }
+  ],
+  "realities": [
+    {
+      "name": "Earth-616",
+      "count": 16345
+    },
+    {
+      "name": "New Earth",
+      "count": 6829
+    },
+    {
+      "name": "Earth-One",
+      "count": 43
+    },
+    {
+      "name": "Earth-Two",
+      "count": 9
+    },
+    {
+      "name": "Prime Earth",
+      "count": 8
+    },
+    {
+      "name": "Alternate",
+      "count": 38
+    }
+  ]
+}
