@@ -27,9 +27,10 @@ interface HudProps {
   onLayout: (l: LayoutName) => void;
   names: boolean;
   onNames: (on: boolean) => void;
+  ignite: number;
 }
 
-export function Hud({ stars, error, layout, onLayout, names, onNames }: HudProps) {
+export function Hud({ stars, error, layout, onLayout, names, onNames, ignite }: HudProps) {
   return (
     <div className="hud">
       <header className="hud-bar">
@@ -64,7 +65,9 @@ export function Hud({ stars, error, layout, onLayout, names, onNames }: HudProps
           {error
             ? `ACQUISITION FAILED — ${error}`
             : stars
-              ? `${stars.count.toLocaleString()} OBJECTS · ${stars.meta.categories.reality.length} REALITIES · 1935–2013`
+              ? ignite < 1
+                ? `IGNITING — ${Math.floor(stars.count * ignite).toLocaleString()} OBJECTS`
+                : `${stars.count.toLocaleString()} OBJECTS · ${stars.meta.categories.reality.length} REALITIES · 1935–2013`
               : 'ACQUIRING SURVEY DATA…'}
         </span>
         <span className="hud-layout">

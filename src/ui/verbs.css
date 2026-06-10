@@ -1,0 +1,173 @@
+/* ---- chrome for the four verbs: tooltip · sweep · dossier · expose ---- */
+
+/* hover tooltip */
+.tooltip {
+  position: fixed;
+  z-index: 20;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--bone);
+  background: color-mix(in srgb, var(--ink) 85%, transparent);
+  border: 1px solid #232733;
+  border-left: 2px solid var(--coral);
+  padding: 6px 10px;
+  transform: translate(14px, -50%);
+  white-space: nowrap;
+}
+.tooltip .dim { color: var(--annot); }
+
+/* sweep ping */
+.ping {
+  position: fixed;
+  z-index: 15;
+  pointer-events: none;
+  border: 1px solid var(--coral);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ping-out 1.5s ease-out forwards;
+}
+@keyframes ping-out {
+  from { width: 8px; height: 8px; opacity: 0.9; }
+  to { width: 420px; height: 420px; opacity: 0; }
+}
+
+/* field notes plate (sweep census) */
+.fieldnotes {
+  position: fixed;
+  left: 24px;
+  bottom: 64px;
+  z-index: 20;
+  max-width: 460px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+  background: color-mix(in srgb, var(--ink) 88%, transparent);
+  border: 1px solid #232733;
+  border-left: 2px solid var(--coral);
+  padding: 14px 18px;
+  animation: notes-in 420ms var(--ease-weighty) both;
+}
+.fieldnotes .line1 { font-size: 11px; color: var(--coral); margin-bottom: 8px; }
+.fieldnotes .line2 { font-size: 12px; color: var(--bone); line-height: 1.6; }
+.fieldnotes .line3 { font-size: 11px; color: var(--annot); margin-top: 8px; }
+@keyframes notes-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* expose counter */
+.expose-counter {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 20;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--bone);
+  text-shadow: 0 0 18px rgba(255, 92, 73, 0.35);
+}
+.expose-counter .n { color: var(--coral); }
+
+/* ---- the dossier ---- */
+
+.dossier {
+  position: fixed;
+  top: 64px;
+  right: 24px;
+  bottom: 64px;
+  width: min(430px, 42vw);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  pointer-events: none;
+  animation: dossier-in 700ms var(--ease-weighty) both;
+}
+@keyframes dossier-in {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: none; }
+}
+
+.dossier-plate {
+  background: color-mix(in srgb, var(--ink) 90%, transparent);
+  border: 1px solid #232733;
+  padding: 28px;
+  pointer-events: auto;
+}
+
+.dossier .designation {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--coral);
+}
+
+.dossier h2 {
+  font-family: var(--font-display);
+  font-weight: 640;
+  font-variation-settings: 'opsz' 60;
+  font-size: clamp(26px, 2.6vw, 38px);
+  line-height: 1.04;
+  margin: 10px 0 20px;
+  color: var(--bone);
+}
+
+.dossier dl {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  row-gap: 9px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+}
+.dossier dt { color: var(--annot); }
+.dossier dd { color: var(--bone); }
+
+.dossier .lumen {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #232733;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--annot);
+}
+.dossier .lumen b { color: var(--bone); font-weight: 500; }
+
+.dossier .hint {
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--annot);
+  opacity: 0.7;
+}
+
+/* deceased = eclipse treatment */
+.dossier.deceased .designation { color: #a8624f; }
+.dossier.deceased h2 { color: #b9a99a; }
+.dossier.deceased .status-value { color: #c96b52; }
+
+/* ring gauges anchored on the locked star */
+.gauges {
+  position: fixed;
+  z-index: 18;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.gauges svg { overflow: visible; display: block; }
+.gauges .arc-track { stroke: rgba(233, 226, 208, 0.14); }
+.gauges .arc { stroke: var(--coral); transition: stroke-dashoffset 1.4s var(--ease-weighty); }
+.gauges .year-ring { stroke: rgba(233, 226, 208, 0.22); }
+.gauges .year-tick { stroke: var(--coral); }
+.gauges .spin { animation: gauge-spin 40s linear infinite; transform-origin: center; }
+@keyframes gauge-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ping, .fieldnotes, .dossier { animation: none; }
+  .gauges .spin { animation: none; }
+  .gauges .arc { transition: none; }
+}

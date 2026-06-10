@@ -2,7 +2,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { loadSurvey, type StarFields } from './data/parser';
 import { StarField, type LayoutName } from './scene/field';
 import { Hud } from './ui/Hud';
+import { Verbs, designationOf } from './ui/Verbs';
 import { DesignPage } from './ui/DesignPage';
+
+function parseDeepLink(): number {
+  const m = window.location.pathname.match(/^\/star\/PS-(\d{1,5})$/);
+  if (!m) return -1;
+  const idx = parseInt(m[1], 10) - 1;
+  return idx >= 0 && idx < 23272 ? idx : -1;
+}
 
 export default function App() {
   // hidden, never-linked design reference (no router needed for one path)
@@ -13,10 +21,14 @@ export default function App() {
 function Survey() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fieldRef = useRef<StarField | null>(null);
+  const [field, setField] = useState<StarField | null>(null);
   const [stars, setStars] = useState<StarFields | null>(null);
+  const [names, setNames] = useState<string[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [layout, setLayout] = useState<LayoutName>('spiral');
-  const [names, setNames] = useState(true);
+  const [showNames, setShowNames] = useState(true);
+  const [ignite, setIgnite] = useState(0);
+  const igniteRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -25,12 +37,27 @@ function Survey() {
       .then(async (s) => {
         if (cancelled || !canvasRef.current) return;
         setStars(s);
-        const field = new StarField(canvasRef.current, s);
-        fieldRef.current = field;
-        // designations default ON — lazy-load the catalog names
+        const f = new StarField(canvasRef.current, s);
+        fieldRef.current = f;
+        setField(f);
+
+        f.events.addEventListener('ignite', (e) => {
+          const p = ((e as CustomEvent).detail as { progress: number }).progress;
+          if (p - igniteRef.current > 0.02 || p === 1) {
+            igniteRef.current = p;
+            setIgnite(p);
+          }
+        });
+
         const res = await fetch('/data/names.json');
         const data = (await res.json()) as { name: string[] };
-        if (!cancelled) field.labels.setNames(data.name);
+        if (cancelled) return;
+        f.labels.setNames(data.name);
+        setNames(data.name);
+
+        // deep link: /star/PS-00001 → fly + lock once the sky has ignited
+        const deep = parseDeepLink();
+        if (deep >= 0) window.setTimeout(() => f.lock(deep), 1200);
       })
       .catch((e: Error) => setError(e.message));
 
@@ -48,7 +75,12 @@ function Survey() {
 
   const onNames = useCallback((on: boolean) => {
     fieldRef.current?.labels.setEnabled(on);
-    setNames(on);
+    setShowNames(on);
+  }, []);
+
+  const onLockChange = useCallback((index: number) => {
+    const path = index >= 0 ? `/star/${designationOf(index)}` : '/';
+    if (window.location.pathname !== path) window.history.pushState(null, '', path);
   }, []);
 
   return (
@@ -59,9 +91,13 @@ function Survey() {
         error={error}
         layout={layout}
         onLayout={onLayout}
-        names={names}
+        names={showNames}
         onNames={onNames}
+        ignite={ignite}
       />
+      {field && stars && (
+        <Verbs field={field} stars={stars} names={names} onLockChange={onLockChange} />
+      )}
     </>
   );
 }
