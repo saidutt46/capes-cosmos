@@ -214,7 +214,9 @@ export class StarField {
     this.geo = new THREE.BufferGeometry();
     const from = this.layouts.spiral.slice();
     this.geo.setAttribute('position', new THREE.BufferAttribute(from, 3));
-    this.geo.setAttribute('aTarget', new THREE.BufferAttribute(this.layouts.spiral, 3));
+    // own copy — aliasing this.layouts.spiral here would let setLayout()
+    // overwrite the stored layout and corrupt every return trip to spiral
+    this.geo.setAttribute('aTarget', new THREE.BufferAttribute(this.layouts.spiral.slice(), 3));
     this.geo.setAttribute('aDelay', new THREE.BufferAttribute(this.delays, 1));
     this.geo.setAttribute('aColor', new THREE.BufferAttribute(colors, 3));
     this.geo.setAttribute('aRing', new THREE.BufferAttribute(rings, 3));

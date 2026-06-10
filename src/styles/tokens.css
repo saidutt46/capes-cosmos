@@ -36,3 +36,16 @@ html, body, #root {
 }
 
 ::selection { background: var(--coral); color: var(--void); }
+
+/* ---- instrument cursors ----
+   The pointer is part of the instrument: a survey reticle (bone ring, coral
+   center) over the sky; a filled reticle over interactive chrome. */
+:root {
+  --cursor-reticle: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="8" fill="none" stroke="%23E9E2D0" stroke-width="1.2" opacity="0.9"/><circle cx="14" cy="14" r="1.6" fill="%23FF5C49"/><line x1="14" y1="1" x2="14" y2="6" stroke="%23E9E2D0" stroke-width="1.2" opacity="0.7"/><line x1="14" y1="22" x2="14" y2="27" stroke="%23E9E2D0" stroke-width="1.2" opacity="0.7"/><line x1="1" y1="14" x2="6" y2="14" stroke="%23E9E2D0" stroke-width="1.2" opacity="0.7"/><line x1="22" y1="14" x2="27" y2="14" stroke="%23E9E2D0" stroke-width="1.2" opacity="0.7"/></svg>') 14 14;
+  --cursor-target: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="8" fill="none" stroke="%23FF5C49" stroke-width="1.6"/><circle cx="14" cy="14" r="2.4" fill="%23FF5C49"/><line x1="14" y1="1" x2="14" y2="6" stroke="%23FF5C49" stroke-width="1.6"/><line x1="14" y1="22" x2="14" y2="27" stroke="%23FF5C49" stroke-width="1.6"/><line x1="1" y1="14" x2="6" y2="14" stroke="%23FF5C49" stroke-width="1.6"/><line x1="22" y1="14" x2="27" y2="14" stroke="%23FF5C49" stroke-width="1.6"/></svg>') 14 14;
+}
+
+body { cursor: var(--cursor-reticle), crosshair; }
+canvas { cursor: var(--cursor-reticle), crosshair; }
+canvas:active { cursor: var(--cursor-target), grabbing; }
+button, a, [role='button'] { cursor: var(--cursor-target), pointer; }
