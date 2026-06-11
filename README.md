@@ -33,7 +33,17 @@ npm run dev        # http://localhost:5180  (5173 belongs to switchboard on this
 - **EXPOSE** — press and hold: long-exposure develops the ~6,200 characters
   who appeared exactly once. Release, and they fade back into the dark.
 - **LENSES** (left edge) — FATE / CLASS / UNIVERSE dim everything that doesn't
-  match. **DESIGNATIONS** (top right) — distance-culled floating names.
+  match; `✕ ALL` (or Esc) returns the full sky. **DESIGNATIONS** (top right) —
+  distance-culled floating names.
+- **RADIO** (top right) — the survey's audio band: every character has a
+  deterministic pulsar signature (rhythm from designation, pitch from debut
+  year, decay from luminosity, timbre from alignment; the deceased echo).
+  Lock a star and it broadcasts; sweep and the sector answers in chord.
+  Off by default; zero samples, pure WebAudio.
+- **CALIBRATION** — epoch rings and decade gates mark time in every sky, a
+  skippable first-light sequence teaches the chart on each launch, and the
+  KEY chip (bottom left) is the permanent legend. Constellations carry
+  reality placards (EARTH-616 · NEW EARTH · the dwarf realities).
 - Honors `prefers-reduced-motion`; coarse-pointer devices skip post FX.
 
 ## Verify
