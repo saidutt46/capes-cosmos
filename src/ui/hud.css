@@ -115,7 +115,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
-  max-width: 420px;
+  max-width: 480px;
   text-align: right;
 }
 
@@ -125,9 +125,9 @@
 }
 
 .hud-legend {
-  color: var(--annot);
-  font-size: 11px;
-  line-height: 1.5;
+  color: color-mix(in srgb, var(--bone) 85%, transparent);
+  font-size: 14px;
+  line-height: 1.55;
   position: relative;
 }
 
@@ -145,11 +145,15 @@
 }
 .glitch::before {
   color: var(--coral);
-  animation: glitch-slice-a 1.6s steps(14) both;
+  animation:
+    glitch-slice-a 1.6s steps(14) both,
+    glitch-recur-a 9s steps(2) 4s infinite;
 }
 .glitch::after {
   color: #4595ff;
-  animation: glitch-slice-b 1.6s steps(14) both;
+  animation:
+    glitch-slice-b 1.6s steps(14) both,
+    glitch-recur-b 9s steps(2) 4s infinite;
 }
 
 @keyframes glitch-settle {
@@ -172,6 +176,20 @@
   40% { opacity: 0.5; clip-path: inset(45% 0 25% 0); transform: translateX(2px); }
   60% { opacity: 0.25; clip-path: inset(2% 0 80% 0); transform: translateX(-1px); }
   80%, 100% { opacity: 0; clip-path: inset(0 0 0 0); transform: none; }
+}
+
+/* live-transmission flicker: 2 frames of rgb-split every ~9s */
+@keyframes glitch-recur-a {
+  0%, 96% { opacity: 0; }
+  96.6% { opacity: 0.55; clip-path: inset(20% 0 45% 0); transform: translateX(-2px); }
+  97.4% { opacity: 0.3; clip-path: inset(65% 0 8% 0); transform: translateX(2px); }
+  98%, 100% { opacity: 0; }
+}
+@keyframes glitch-recur-b {
+  0%, 96% { opacity: 0; }
+  96.6% { opacity: 0.55; clip-path: inset(60% 0 12% 0); transform: translateX(2px); }
+  97.4% { opacity: 0.3; clip-path: inset(10% 0 70% 0); transform: translateX(-2px); }
+  98%, 100% { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
