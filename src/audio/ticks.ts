@@ -10,6 +10,19 @@ export function setSoundMuted(m: boolean) {
   muted = m;
 }
 
+/** resume the tick context from inside a user gesture — resume() is async,
+ * so doing it here (pointerdown) means the context is already running by the
+ * time a click handler asks ensure() for it */
+export function wakeSounds() {
+  if (typeof AudioContext === 'undefined') return;
+  try {
+    ctx ??= new AudioContext();
+  } catch {
+    return;
+  }
+  if (ctx.state === 'suspended') void ctx.resume();
+}
+
 function ensure(): AudioContext | null {
   if (muted) return null;
   if (typeof AudioContext === 'undefined') return null;
