@@ -1,0 +1,394 @@
+/* FLIGHT — hangar + in-flight HUD. Same observatory grammar as the survey:
+   void/ink panels, bone text, coral as the single accent, mono + Fraunces. */
+
+/* ---------- shared minimal top bar (hangar + flight own their own chrome) ---------- */
+
+.flight-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 18px 24px;
+  font-family: var(--font-mono);
+  z-index: 20;
+  pointer-events: none;
+}
+.flight-topbar .wordmark {
+  color: var(--bone);
+  font-size: 14px;
+  letter-spacing: 0.32em;
+}
+.flight-topbar .cursor {
+  color: var(--coral);
+  animation: blink 1.2s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .flight-topbar .cursor { animation: none; }
+}
+
+/* ---------- HANGAR overlay ---------- */
+
+.hangar {
+  position: fixed;
+  inset: 0;
+  z-index: 18;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(120% 90% at 50% 30%, transparent 40%, color-mix(in srgb, var(--void) 72%, transparent) 100%);
+  font-family: var(--font-mono);
+}
+
+.hangar-panel {
+  width: min(880px, 92vw);
+  max-height: 86vh;
+  overflow: auto;
+  background: color-mix(in srgb, var(--ink) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--annot) 30%, transparent);
+  backdrop-filter: blur(8px);
+  padding: 28px 34px 26px;
+  pointer-events: auto;
+}
+
+.hangar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 1px solid color-mix(in srgb, var(--annot) 24%, transparent);
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+}
+.hangar-title {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 560;
+  letter-spacing: 0.1em;
+  color: var(--bone);
+  line-height: 1;
+}
+.hangar-sub {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--annot);
+}
+
+.hangar-cols {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 28px;
+}
+@media (max-width: 680px) {
+  .hangar-cols { grid-template-columns: 1fr; }
+}
+
+.hangar-coltitle {
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  color: var(--annot);
+  margin-bottom: 12px;
+}
+
+/* map list */
+.map-list { display: flex; flex-direction: column; gap: 6px; }
+.map-row {
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-left: 2px solid color-mix(in srgb, var(--annot) 30%, transparent);
+  padding: 9px 12px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: border-color var(--dur-ui) ease, background var(--dur-ui) ease;
+}
+.map-row:hover { background: color-mix(in srgb, var(--bone) 5%, transparent); }
+.map-row.sel {
+  border-left-color: var(--coral);
+  background: color-mix(in srgb, var(--coral) 9%, transparent);
+}
+.map-name {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--bone);
+}
+.map-row.sel .map-name { color: var(--coral); }
+.map-note {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--annot);
+  margin-top: 3px;
+}
+
+/* vessel list */
+.vessel-list { display: flex; flex-direction: column; gap: 8px; }
+.vessel-row {
+  text-align: left;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--annot) 22%, transparent);
+  padding: 11px 14px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  transition: border-color var(--dur-ui) ease, background var(--dur-ui) ease;
+}
+.vessel-row:hover { background: color-mix(in srgb, var(--bone) 5%, transparent); }
+.vessel-row.sel {
+  border-color: color-mix(in srgb, var(--coral) 55%, transparent);
+  background: color-mix(in srgb, var(--coral) 8%, transparent);
+}
+.vessel-name {
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  color: var(--bone);
+}
+.vessel-row.sel .vessel-name { color: var(--coral); }
+.vessel-blurb {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-style: italic;
+  color: var(--annot);
+  margin: 4px 0 9px;
+  letter-spacing: 0.01em;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin: 3px 0;
+}
+.stat-label {
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--annot);
+}
+.stat-bar { display: flex; gap: 3px; }
+.stat-seg {
+  width: 14px;
+  height: 6px;
+  background: color-mix(in srgb, var(--annot) 24%, transparent);
+}
+.stat-seg.on { background: var(--bone); }
+.vessel-row.sel .stat-seg.on { background: var(--coral); }
+.stat-extra {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--annot);
+  margin-top: 6px;
+}
+
+.hangar-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--annot) 24%, transparent);
+}
+.launch-btn {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  color: var(--void);
+  background: var(--coral);
+  border: none;
+  padding: 11px 26px;
+  cursor: pointer;
+  transition: filter var(--dur-ui) ease;
+}
+.launch-btn:hover { filter: brightness(1.12); }
+.launch-btn:active { transform: translateY(1px); }
+.hangar-hint {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--annot);
+}
+.hangar-close {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--annot);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--annot) 30%, transparent);
+  padding: 7px 14px;
+  cursor: pointer;
+}
+.hangar-close:hover { color: var(--bone); border-color: var(--bone); }
+
+/* ---------- FLIGHT HUD (in-flight instrument chrome) ---------- */
+
+.flight-hud {
+  position: fixed;
+  inset: 0;
+  z-index: 16;
+  pointer-events: none;
+  font-family: var(--font-mono);
+}
+
+.fh-corner {
+  position: fixed;
+  font-family: var(--font-mono);
+}
+
+/* top-left: vessel · map + beacon counter */
+.fh-tl { top: 64px; left: 24px; }
+.fh-vessel {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  color: var(--bone);
+}
+.fh-map { color: var(--annot); }
+.fh-beacons {
+  font-size: 20px;
+  letter-spacing: 0.1em;
+  color: var(--coral);
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.fh-beacons span { color: var(--annot); font-size: 11px; letter-spacing: 0.2em; }
+
+/* bottom-center: speed */
+.fh-speed {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+.fh-speed-val {
+  font-size: 30px;
+  letter-spacing: 0.06em;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+.fh-speed-unit { font-size: 13px; color: var(--annot); letter-spacing: 0.1em; }
+.fh-boost {
+  display: inline-block;
+  margin-left: 12px;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: var(--coral);
+  animation: fh-boost-pulse 0.7s steps(2) infinite;
+}
+@keyframes fh-boost-pulse { 50% { opacity: 0.4; } }
+@media (prefers-reduced-motion: reduce) {
+  .fh-boost { animation: none; }
+}
+
+/* right: proximity card */
+.fh-prox {
+  position: fixed;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  width: 220px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--ink) 86%, transparent);
+  border: 1px solid color-mix(in srgb, var(--annot) 28%, transparent);
+  backdrop-filter: blur(6px);
+}
+.fh-prox-label {
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--annot);
+  margin-bottom: 6px;
+}
+.fh-prox-name {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--bone);
+}
+.fh-prox-desig { font-size: 10px; letter-spacing: 0.14em; color: var(--annot); margin: 2px 0 8px; }
+.fh-prox-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--annot);
+  padding: 2px 0;
+}
+.fh-prox-row b { color: var(--bone); font-weight: 500; }
+.fh-prox-pull b { color: var(--coral); }
+.fh-prox-empty { font-size: 10px; letter-spacing: 0.12em; color: var(--annot); }
+
+/* bottom-left: flight log */
+.fh-log {
+  position: fixed;
+  bottom: 30px;
+  left: 24px;
+  width: 360px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+.fh-log-title {
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  color: var(--annot);
+  margin-bottom: 6px;
+}
+.fh-log-line {
+  color: color-mix(in srgb, var(--bone) 80%, transparent);
+  padding: 1px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fh-log-line .lc { color: var(--coral); }
+.fh-log-line.new { animation: fh-log-in 0.5s steps(8) both; }
+@keyframes fh-log-in { from { opacity: 0; transform: translateX(-6px); } }
+@media (prefers-reduced-motion: reduce) {
+  .fh-log-line.new { animation: none; }
+}
+
+/* hints line */
+.fh-hints {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--annot);
+}
+.fh-hints b { color: var(--bone); font-weight: 500; }
+
+/* SURVEY COMPLETE banner */
+.fh-complete {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 17;
+  pointer-events: none;
+}
+.fh-complete-inner {
+  text-align: center;
+  background: color-mix(in srgb, var(--ink) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--coral) 45%, transparent);
+  backdrop-filter: blur(6px);
+  padding: 28px 44px;
+  animation: fh-complete-in 0.6s var(--ease-weighty) both;
+}
+@keyframes fh-complete-in { from { opacity: 0; transform: scale(0.94); } }
+.fh-complete-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 560;
+  letter-spacing: 0.14em;
+  color: var(--coral);
+}
+.fh-complete-sub {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--annot);
+  margin-top: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fh-complete-inner { animation: none; }
+}

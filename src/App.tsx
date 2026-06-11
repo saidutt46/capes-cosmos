@@ -9,7 +9,11 @@ import { DesignPage } from './ui/DesignPage';
 import { MethodologyPage } from './ui/MethodologyPage';
 import { RadioBand } from './audio/radio';
 import { signatureOf } from './audio/signature';
-import { setSoundMuted, wakeSounds } from './audio/ticks';
+import { setSoundMuted, wakeSounds, launchSound } from './audio/ticks';
+import { FlightMode } from './game/flight';
+import type { ShipId } from './game/ships';
+import { Hangar } from './game/hud/Hangar';
+import { FlightHud } from './game/hud/FlightHud';
 
 function parseDeepLink(): number {
   const m = window.location.pathname.match(/^\/star\/PS-(\d{1,5})$/);
@@ -41,6 +45,14 @@ function Survey() {
   const radioRef = useRef<RadioBand | null>(null);
   const [radio, setRadio] = useState(RadioBand.supported); // the band is on by default
   const [armed, setArmed] = useState(false); // flips at the first user gesture
+
+  // FLIGHT game mode
+  const [mode, setMode] = useState<'survey' | 'hangar' | 'flight'>('survey');
+  const [flightShip, setFlightShip] = useState<ShipId>('atlas');
+  const [flightMap, setFlightMap] = useState<LayoutName>('tunnel');
+  const flightRef = useRef<FlightMode | null>(null);
+  const [flight, setFlight] = useState<FlightMode | null>(null);
+  const launchTimer = useRef(0);
 
   const onRadio = useCallback((on: boolean) => {
     if (on) {
@@ -117,6 +129,9 @@ function Survey() {
 
     return () => {
       cancelled = true;
+      window.clearTimeout(launchTimer.current);
+      flightRef.current?.dispose();
+      flightRef.current = null;
       radioRef.current?.dispose();
       fieldRef.current?.dispose();
       fieldRef.current = null;
@@ -142,6 +157,48 @@ function Survey() {
     const path = index >= 0 ? `/star/${designationOf(index)}` : '/';
     if (window.location.pathname !== path) window.history.pushState(null, '', path);
   }, []);
+
+  // ---------- FLIGHT orchestration ----------
+
+  const disposeFlight = useCallback(() => {
+    flightRef.current?.dispose();
+    flightRef.current = null;
+    setFlight(null);
+    delete (window as unknown as Record<string, unknown>).__paperSkyFlight;
+  }, []);
+
+  const onFlight = useCallback(() => setMode('hangar'), []);
+
+  // LAUNCH: morph the field to the chosen map, then start flight at its checkpoint
+  const onLaunch = useCallback(() => {
+    const f = fieldRef.current;
+    if (!f || !stars) return;
+    f.setLayout(flightMap); // a no-op if already on that layout (mix already 1)
+    launchSound();
+    window.clearTimeout(launchTimer.current);
+    // wait for the morph to settle, then construct flight + take over the scene
+    const begin = () => {
+      const ff = fieldRef.current;
+      if (!ff || !stars) return;
+      const fm = new FlightMode(ff, stars, names, flightMap, flightShip, radioRef.current ?? undefined);
+      flightRef.current = fm;
+      setFlight(fm);
+      fm.events.addEventListener('exit', () => {
+        disposeFlight();
+        setMode('hangar');
+      });
+      (window as unknown as Record<string, unknown>).__paperSkyFlight = {
+        speed: () => fm.speed,
+        heading: () => fm.heading,
+        beacons: () => fm.beacons,
+      };
+      setMode('flight');
+    };
+    // if the field is already on the target layout the morph won't run; start soon.
+    launchTimer.current = window.setTimeout(begin, f.layout === flightMap ? 120 : 2300);
+  }, [stars, names, flightMap, flightShip, disposeFlight]);
+
+  const onHangarClose = useCallback(() => setMode('survey'), []);
 
   // radio: locked star broadcasts; sweeps answer as a chord
   // (`armed` re-runs this once the first gesture has built the band)
@@ -174,27 +231,45 @@ function Survey() {
   return (
     <>
       <canvas ref={canvasRef} style={{ position: 'fixed', inset: 0 }} />
-      <Hud
-        stars={stars}
-        error={error}
-        layout={layout}
-        onLayout={onLayout}
-        names={showNames}
-        onNames={onNames}
-        ignite={ignite}
-        lens={lens}
-        onLens={onLens}
-        radio={radio}
-        onRadio={onRadio}
-        radioSupported={RadioBand.supported}
-      />
-      <Key
-        layout={layout}
-        onRecalibrate={() => setCalibRun(true)}
-      />
-      <Calibration ignite={ignite} run={calibRun} onDone={() => setCalibRun(false)} />
-      {field && stars && (
-        <Verbs field={field} stars={stars} names={names} onLockChange={onLockChange} radio={radio} />
+
+      {mode === 'survey' && (
+        <>
+          <Hud
+            stars={stars}
+            error={error}
+            layout={layout}
+            onLayout={onLayout}
+            names={showNames}
+            onNames={onNames}
+            ignite={ignite}
+            lens={lens}
+            onLens={onLens}
+            radio={radio}
+            onRadio={onRadio}
+            radioSupported={RadioBand.supported}
+            onFlight={onFlight}
+          />
+          <Key layout={layout} onRecalibrate={() => setCalibRun(true)} />
+          <Calibration ignite={ignite} run={calibRun} onDone={() => setCalibRun(false)} />
+          {field && stars && (
+            <Verbs field={field} stars={stars} names={names} onLockChange={onLockChange} radio={radio} />
+          )}
+        </>
+      )}
+
+      {mode === 'hangar' && (
+        <Hangar
+          map={flightMap}
+          ship={flightShip}
+          onMap={setFlightMap}
+          onShip={setFlightShip}
+          onLaunch={onLaunch}
+          onClose={onHangarClose}
+        />
+      )}
+
+      {mode === 'flight' && flight && stars && (
+        <FlightHud flight={flight} ship={flightShip} map={flightMap} stars={stars} names={names} />
       )}
     </>
   );

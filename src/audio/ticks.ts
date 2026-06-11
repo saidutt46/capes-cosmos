@@ -10,6 +10,11 @@ export function setSoundMuted(m: boolean) {
   muted = m;
 }
 
+/** read the global mute (RADIO OFF) — used by the flight engine hum */
+export function soundsMuted(): boolean {
+  return muted;
+}
+
 /** resume the tick context from inside a user gesture — resume() is async,
  * so doing it here (pointerdown) means the context is already running by the
  * time a click handler asks ensure() for it */
@@ -98,6 +103,34 @@ export function lensSound(on: boolean) {
   if (!c) return;
   if (on) note(c, { type: 'square', from: 740, to: 980, dur: 0.1, gain: 0.03, cutoff: 2400 });
   else note(c, { type: 'square', from: 620, to: 420, dur: 0.12, gain: 0.03, cutoff: 2000 });
+}
+
+/** FLIGHT — beacon survey ping. A bright two-note chime when a beacon registers. */
+export function beaconChime() {
+  const c = ensure();
+  if (!c) return;
+  note(c, { type: 'triangle', from: 1320, dur: 0.16, gain: 0.05, cutoff: 4200 });
+  note(c, { type: 'triangle', from: 1980, at: 0.1, dur: 0.22, gain: 0.045, cutoff: 4800 });
+}
+
+/** FLIGHT — launch ignition. A rising swell as the vessel lights its engines (~0.8s). */
+export function launchSound() {
+  const c = ensure();
+  if (!c) return;
+  note(c, { type: 'sawtooth', from: 70, to: 220, dur: 0.8, gain: 0.07, cutoff: 1200 });
+  note(c, { type: 'sine', from: 140, to: 440, at: 0.12, dur: 0.7, gain: 0.04 });
+  note(c, { type: 'triangle', from: 880, at: 0.42, dur: 0.3, gain: 0.03, cutoff: 3600 });
+}
+
+/** FLIGHT — survey complete. A short resolved major chord. */
+export function fanfare() {
+  const c = ensure();
+  if (!c) return;
+  // I–V–I voicing rising, then the triad held together
+  note(c, { type: 'triangle', from: 523, dur: 0.5, gain: 0.05, cutoff: 4000 });
+  note(c, { type: 'triangle', from: 659, at: 0.12, dur: 0.5, gain: 0.045, cutoff: 4000 });
+  note(c, { type: 'triangle', from: 784, at: 0.24, dur: 0.6, gain: 0.045, cutoff: 4400 });
+  note(c, { type: 'sine', from: 1047, at: 0.36, dur: 0.7, gain: 0.04 });
 }
 
 /** one keystroke blip — pitch jitters deterministically per char index */

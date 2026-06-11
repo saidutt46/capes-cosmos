@@ -41,9 +41,12 @@ interface HudProps {
   radio: boolean;
   onRadio: (on: boolean) => void;
   radioSupported: boolean;
+  onFlight: () => void;
 }
 
-export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, lens, onLens, radio, onRadio, radioSupported }: HudProps) {
+const COARSE = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
+
+export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, lens, onLens, radio, onRadio, radioSupported, onFlight }: HudProps) {
   return (
     <div className="hud">
       <header className="hud-bar hud-top">
@@ -65,6 +68,18 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, le
               {l.label}
             </button>
           ))}
+          {!COARSE && (
+            <>
+              <span className="dial-sep" aria-hidden="true" />
+              <button
+                className="dial-btn flight-btn"
+                data-testid="flight-toggle"
+                onClick={onFlight}
+              >
+                FLIGHT ▸
+              </button>
+            </>
+          )}
         </nav>
 
         <span className="hud-right">

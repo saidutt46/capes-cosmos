@@ -108,6 +108,17 @@
 
 .names-btn { font-size: 10px; }
 
+/* FLIGHT entry — set apart from the layout dial by a hairline separator */
+.dial-sep {
+  align-self: center;
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: color-mix(in srgb, var(--annot) 35%, transparent);
+}
+.flight-btn { color: var(--coral); letter-spacing: 0.18em; }
+.flight-btn:hover { color: var(--bone); }
+
 /* ---- lens bar (left edge, vertical) ---- */
 
 .lens-bar {
