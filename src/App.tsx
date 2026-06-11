@@ -40,6 +40,7 @@ function Survey() {
   const [calibRun, setCalibRun] = useState(() => !localStorage.getItem(QUIET_FLAG));
   const radioRef = useRef<RadioBand | null>(null);
   const [radio, setRadio] = useState(RadioBand.supported); // the band is on by default
+  const [armed, setArmed] = useState(false); // flips at the first user gesture
 
   const onRadio = useCallback((on: boolean) => {
     if (on) {
@@ -55,17 +56,19 @@ function Survey() {
     setRadio(on);
   }, []);
 
-  // default-on: arm the band at launch; browsers gate audio behind a gesture,
-  // so re-resume on every interaction until running (resume() is async — a
-  // one-shot listener loses the race against the same gesture's click handler)
+  // default-on: the AudioContext must be BORN inside a user gesture — one
+  // created at mount starts suspended and some browsers never let it recover.
+  // So the band arms itself at the first pointerdown/keydown, and re-resumes
+  // on later gestures in case the browser re-suspends it.
   useEffect(() => {
     if (!radio) return undefined;
-    radioRef.current ??= new RadioBand();
-    radioRef.current.enable();
     const wake = () => {
-      radioRef.current?.enable();
+      radioRef.current ??= new RadioBand();
+      radioRef.current.enable();
       wakeSounds();
+      setArmed(true);
     };
+    if (navigator.userActivation?.hasBeenActive) wake(); // gesture already happened
     window.addEventListener('pointerdown', wake);
     window.addEventListener('keydown', wake);
     return () => {
@@ -141,10 +144,12 @@ function Survey() {
   }, []);
 
   // radio: locked star broadcasts; sweeps answer as a chord
+  // (`armed` re-runs this once the first gesture has built the band)
   useEffect(() => {
     const f = field;
     const r = radioRef.current;
     if (!f || !stars || !radio || !r) return;
+    void armed;
     const onLock = (e: Event) => {
       const { index } = (e as CustomEvent).detail as { index: number };
       r.playSignature(signatureOf(index, stars));
@@ -164,7 +169,7 @@ function Survey() {
       f.events.removeEventListener('sweep', onSweep);
       r.stopSignature();
     };
-  }, [field, stars, radio]);
+  }, [field, stars, radio, armed]);
 
   return (
     <>

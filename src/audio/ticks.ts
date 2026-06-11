@@ -26,6 +26,10 @@ export function wakeSounds() {
 function ensure(): AudioContext | null {
   if (muted) return null;
   if (typeof AudioContext === 'undefined') return null;
+  // never create the context before the page has real user activation —
+  // a pre-gesture context starts suspended and poisons every later attempt;
+  // created inside/after a gesture it starts running immediately
+  if (!ctx && !(navigator.userActivation?.hasBeenActive ?? true)) return null;
   try {
     ctx ??= new AudioContext();
   } catch {
