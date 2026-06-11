@@ -130,14 +130,19 @@
 
 .hud-layout-name {
   color: var(--bone);
-  letter-spacing: 0.2em;
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 550;
+  letter-spacing: 0.12em;
 }
 
 .hud-legend {
   color: color-mix(in srgb, var(--bone) 85%, transparent);
+  font-family: var(--font-body);
   font-size: 14px;
   line-height: 1.55;
   position: relative;
+  letter-spacing: 0.02em;
 }
 
 /* glitch-in: rgb-split slices that settle into clean text */
