@@ -9,6 +9,7 @@ import { DesignPage } from './ui/DesignPage';
 import { MethodologyPage } from './ui/MethodologyPage';
 import { RadioBand } from './audio/radio';
 import { signatureOf } from './audio/signature';
+import { setSoundMuted } from './audio/ticks';
 
 function parseDeepLink(): number {
   const m = window.location.pathname.match(/^\/star\/PS-(\d{1,5})$/);
@@ -38,7 +39,7 @@ function Survey() {
   const igniteRef = useRef(0);
   const [calibRun, setCalibRun] = useState(() => !localStorage.getItem(QUIET_FLAG));
   const radioRef = useRef<RadioBand | null>(null);
-  const [radio, setRadio] = useState(false);
+  const [radio, setRadio] = useState(RadioBand.supported); // the band is on by default
 
   const onRadio = useCallback((on: boolean) => {
     if (on) {
@@ -47,11 +48,27 @@ function Survey() {
     } else {
       radioRef.current?.disable();
     }
+    setSoundMuted(!on); // RADIO doubles as the global mute (nav + typing ticks)
     if (fieldRef.current) {
       (fieldRef.current as unknown as { radioActive: boolean }).radioActive = on;
     }
     setRadio(on);
   }, []);
+
+  // default-on: arm the band at launch; browsers gate audio behind a gesture,
+  // so resume again on the first interaction (which is when sound matters)
+  useEffect(() => {
+    if (!radio) return undefined;
+    radioRef.current ??= new RadioBand();
+    radioRef.current.enable();
+    const wake = () => radioRef.current?.enable();
+    window.addEventListener('pointerdown', wake, { once: true });
+    window.addEventListener('keydown', wake, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', wake);
+      window.removeEventListener('keydown', wake);
+    };
+  }, [radio]);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,6 +79,7 @@ function Survey() {
         setStars(s);
         const f = new StarField(canvasRef.current, s);
         fieldRef.current = f;
+        (f as unknown as { radioActive: boolean }).radioActive = RadioBand.supported;
         setField(f);
 
         f.events.addEventListener('ignite', (e) => {

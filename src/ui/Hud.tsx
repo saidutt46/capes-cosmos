@@ -1,5 +1,6 @@
 import type { StarFields } from '../data/parser';
 import type { LayoutName, Lens } from '../scene/field';
+import { layoutSound, lensSound } from '../audio/ticks';
 import './hud.css';
 
 /** lens facets: label → (field, category code) */
@@ -56,7 +57,10 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, le
               key={l.id}
               className={`dial-btn${l.id === layout ? ' active' : ''}`}
               data-testid={`dial-${l.id}`}
-              onClick={() => onLayout(l.id)}
+              onClick={() => {
+                if (l.id !== layout) layoutSound(l.id);
+                onLayout(l.id);
+              }}
             >
               {l.label}
             </button>
@@ -88,7 +92,10 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, le
           <button
             className="dial-btn lens-btn lens-clear"
             data-testid="lens-clear"
-            onClick={() => onLens({ field: 'none', value: 0 })}
+            onClick={() => {
+              lensSound(false);
+              onLens({ field: 'none', value: 0 });
+            }}
           >
             ✕ ALL
           </button>
@@ -103,9 +110,10 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, le
                   key={label}
                   className={`dial-btn lens-btn${active ? ' active' : ''}`}
                   data-testid={`lens-${label.toLowerCase()}`}
-                  onClick={() =>
-                    onLens(active ? { field: 'none', value: 0 } : { field: g.field, value: code })
-                  }
+                  onClick={() => {
+                    lensSound(!active);
+                    onLens(active ? { field: 'none', value: 0 } : { field: g.field, value: code });
+                  }}
                 >
                   {label}
                 </button>

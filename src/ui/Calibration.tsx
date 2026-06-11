@@ -15,8 +15,8 @@ const LINES = [
   'TIME WINDS OUTWARD · 1935 AT THE CORE, 2013 AT THE RIM',
 ];
 export const QUIET_FLAG = 'paper-sky:quiet';
-const TYPE_MS = 28;
-const HOLD_MS = 1600;
+const TYPE_MS = 52; // unhurried decode — each line takes ~2.4s to type
+const HOLD_MS = 2800; // then breathes long enough to actually be read
 
 export function Calibration({
   ignite,
@@ -60,7 +60,7 @@ export function Calibration({
     };
     if (reduced) {
       setChars(LINES[line].length);
-      const t = window.setTimeout(advance, 2600);
+      const t = window.setTimeout(advance, 3600);
       return () => window.clearTimeout(t);
     }
     let n = 0;

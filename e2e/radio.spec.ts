@@ -1,15 +1,12 @@
 import { test, expect } from '@playwright/test';
 
-test('RADIO toggle starts the band and the dossier grows a SIGNAL strip', async ({ page }) => {
+test('RADIO is on by default and the dossier grows a SIGNAL strip', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('paper-sky:quiet', '1'));
   await page.goto('/');
   await page.waitForFunction(() => '__paperSky' in window);
 
   const toggle = page.locator('[data-testid="radio-toggle"]');
-  await expect(toggle).toHaveText(/RADIO OFF/);
-
-  await toggle.click();
-  await expect(toggle).toHaveText(/RADIO ON/);
+  await expect(toggle).toHaveText(/RADIO ON/); // on by default
 
   await page.evaluate(() =>
     ((window as never as Record<string, never>)['__paperSky'] as {
