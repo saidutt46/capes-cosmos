@@ -171,3 +171,50 @@
   .gauges .spin { animation: none; }
   .gauges .arc { transition: none; }
 }
+
+/* ---- RADIO signal strip ---- */
+
+.signal { margin-top: 12px; }
+
+.signal-bits {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 16px;
+}
+
+.signal-bits .bit {
+  width: 6px;
+  height: 4px;
+  background: color-mix(in srgb, var(--annot) 50%, transparent);
+}
+.signal-bits .bit.on {
+  height: 14px;
+  background: var(--coral);
+}
+
+.signal-bits .playhead {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--bone);
+  opacity: 0.85;
+  animation: signal-sweep linear infinite;
+}
+@keyframes signal-sweep {
+  from { left: 0; }
+  to { left: 100%; }
+}
+
+.signal-caption {
+  margin-top: 5px;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--annot);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-bits .playhead { animation: none; opacity: 0; }
+}

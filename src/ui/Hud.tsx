@@ -37,9 +37,12 @@ interface HudProps {
   ignite: number;
   lens: Lens;
   onLens: (l: Lens) => void;
+  radio: boolean;
+  onRadio: (on: boolean) => void;
+  radioSupported: boolean;
 }
 
-export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, lens, onLens }: HudProps) {
+export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, lens, onLens, radio, onRadio, radioSupported }: HudProps) {
   return (
     <div className="hud">
       <header className="hud-bar">
@@ -60,6 +63,15 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, le
           ))}
         </nav>
 
+        {radioSupported && (
+          <button
+            className={`dial-btn names-btn${radio ? ' active' : ''}`}
+            data-testid="radio-toggle"
+            onClick={() => onRadio(!radio)}
+          >
+            RADIO {radio ? 'ON' : 'OFF'}
+          </button>
+        )}
         <button
           className={`dial-btn names-btn${names ? ' active' : ''}`}
           data-testid="names-toggle"

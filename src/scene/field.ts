@@ -606,8 +606,7 @@ export class StarField {
     let count = 0;
     let marvel = 0;
     const years: number[] = [];
-    let brightest = -1;
-    let bApp = -1;
+    const top: number[] = []; // indices, appearances desc, max 5
     const v = new THREE.Vector3();
     for (let i = 0; i < this.stars.count; i++) {
       this.evalPosition(i, v);
@@ -619,9 +618,13 @@ export class StarField {
       if (this.stars.universe[i] === 0) marvel++;
       if (this.stars.year[i] !== NA_YEAR) years.push(this.stars.year[i]);
       const app = this.stars.appearances[i];
-      if (app !== NA_APPEARANCES && app > bApp) {
-        bApp = app;
-        brightest = i;
+      if (app !== NA_APPEARANCES) {
+        let k = top.length;
+        while (k > 0 && this.stars.appearances[top[k - 1]] < app) k--;
+        if (k < 5) {
+          top.splice(k, 0, i);
+          if (top.length > 5) top.pop();
+        }
       }
     }
     years.sort((a, b) => a - b);
@@ -629,8 +632,9 @@ export class StarField {
       count,
       marvelPct: count ? (marvel / count) * 100 : 0,
       medianYear: years.length ? years[Math.floor(years.length / 2)] : 0,
-      brightestIndex: brightest,
-      brightestApp: bApp,
+      brightestIndex: top[0] ?? -1,
+      brightestApp: top.length ? this.stars.appearances[top[0]] : -1,
+      topIndices: top,
     };
   }
 

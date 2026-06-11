@@ -9,6 +9,8 @@ export interface SweepCensus {
   medianYear: number; // 0 if unknown-dominated
   brightestIndex: number; // -1 if none
   brightestApp: number;
+  /** up to 5 brightest star indices in radius, appearances desc — radio chord */
+  topIndices: number[];
 }
 
 const ERA_NOTES: [number, number, string][] = [

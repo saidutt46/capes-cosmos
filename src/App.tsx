@@ -7,6 +7,8 @@ import { Calibration, QUIET_FLAG } from './ui/Calibration';
 import { Key } from './ui/Key';
 import { DesignPage } from './ui/DesignPage';
 import { MethodologyPage } from './ui/MethodologyPage';
+import { RadioBand } from './audio/radio';
+import { signatureOf } from './audio/signature';
 
 function parseDeepLink(): number {
   const m = window.location.pathname.match(/^\/star\/PS-(\d{1,5})$/);
@@ -35,6 +37,21 @@ function Survey() {
   const [ignite, setIgnite] = useState(0);
   const igniteRef = useRef(0);
   const [calibRun, setCalibRun] = useState(() => !localStorage.getItem(QUIET_FLAG));
+  const radioRef = useRef<RadioBand | null>(null);
+  const [radio, setRadio] = useState(false);
+
+  const onRadio = useCallback((on: boolean) => {
+    if (on) {
+      radioRef.current ??= new RadioBand();
+      radioRef.current.enable();
+    } else {
+      radioRef.current?.disable();
+    }
+    if (fieldRef.current) {
+      (fieldRef.current as unknown as { radioActive: boolean }).radioActive = on;
+    }
+    setRadio(on);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -75,6 +92,7 @@ function Survey() {
 
     return () => {
       cancelled = true;
+      radioRef.current?.dispose();
       fieldRef.current?.dispose();
       fieldRef.current = null;
     };
@@ -100,6 +118,32 @@ function Survey() {
     if (window.location.pathname !== path) window.history.pushState(null, '', path);
   }, []);
 
+  // radio: locked star broadcasts; sweeps answer as a chord
+  useEffect(() => {
+    const f = field;
+    const r = radioRef.current;
+    if (!f || !stars || !radio || !r) return;
+    const onLock = (e: Event) => {
+      const { index } = (e as CustomEvent).detail as { index: number };
+      r.playSignature(signatureOf(index, stars));
+    };
+    const onRelease = () => r.stopSignature();
+    const onSweep = (e: Event) => {
+      const { census } = (e as CustomEvent).detail as { census: { topIndices: number[] } };
+      r.playChord(census.topIndices.map((i) => signatureOf(i, stars).freq));
+    };
+    f.events.addEventListener('lock', onLock);
+    f.events.addEventListener('release', onRelease);
+    f.events.addEventListener('sweep', onSweep);
+    if (f.locked >= 0) r.playSignature(signatureOf(f.locked, stars)); // radio enabled mid-lock
+    return () => {
+      f.events.removeEventListener('lock', onLock);
+      f.events.removeEventListener('release', onRelease);
+      f.events.removeEventListener('sweep', onSweep);
+      r.stopSignature();
+    };
+  }, [field, stars, radio]);
+
   return (
     <>
       <canvas ref={canvasRef} style={{ position: 'fixed', inset: 0 }} />
@@ -113,6 +157,9 @@ function Survey() {
         ignite={ignite}
         lens={lens}
         onLens={onLens}
+        radio={radio}
+        onRadio={onRadio}
+        radioSupported={RadioBand.supported}
       />
       <Key
         layout={layout}
@@ -120,7 +167,7 @@ function Survey() {
       />
       <Calibration ignite={ignite} run={calibRun} onDone={() => setCalibRun(false)} />
       {field && stars && (
-        <Verbs field={field} stars={stars} names={names} onLockChange={onLockChange} />
+        <Verbs field={field} stars={stars} names={names} onLockChange={onLockChange} radio={radio} />
       )}
     </>
   );

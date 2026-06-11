@@ -7,6 +7,7 @@ import type { StarField, LockInfo } from '../scene/field';
 import type { StarFields } from '../data/parser';
 import { NA_APPEARANCES, NA_U8, NA_YEAR } from '../data/parser';
 import { annotate, censusLine, type SweepCensus } from '../data/fieldnotes';
+import { signatureOf } from '../audio/signature';
 import './verbs.css';
 
 const MAX_APP = 4043;
@@ -20,6 +21,7 @@ interface VerbsProps {
   stars: StarFields;
   names: string[] | null;
   onLockChange: (index: number) => void;
+  radio: boolean;
 }
 
 interface HoverEvt {
@@ -35,7 +37,7 @@ interface SweepEvt {
   y: number;
 }
 
-export function Verbs({ field, stars, names, onLockChange }: VerbsProps) {
+export function Verbs({ field, stars, names, onLockChange, radio }: VerbsProps) {
   const [hover, setHover] = useState<HoverEvt | null>(null);
   const [sweep, setSweep] = useState<SweepEvt | null>(null);
   const [lock, setLock] = useState<LockInfo | null>(null);
@@ -131,7 +133,7 @@ export function Verbs({ field, stars, names, onLockChange }: VerbsProps) {
       )}
 
       {lock && names && (
-        <Dossier field={field} stars={stars} names={names} lock={lock} />
+        <Dossier field={field} stars={stars} names={names} lock={lock} radio={radio} />
       )}
     </>
   );
@@ -148,11 +150,13 @@ function Dossier({
   stars,
   names,
   lock,
+  radio,
 }: {
   field: StarField;
   stars: StarFields;
   names: string[];
   lock: LockInfo;
+  radio: boolean;
 }) {
   const i = lock.index;
   const gaugeRef = useRef<HTMLDivElement>(null);
@@ -180,6 +184,7 @@ function Dossier({
   const app = stars.appearances[i];
   const hasApp = app !== NA_APPEARANCES;
   const pct = field.percentileOf(i);
+  const sig = radio ? signatureOf(i, stars) : null;
 
   // cohort size: same debut year, same universe (the whole sky, not just lines)
   let cohortTotal = 0;
@@ -262,6 +267,20 @@ function Dossier({
               </>
             )}
           </div>
+          {sig && (
+            <div className="signal" data-testid="signal">
+              <div className="signal-bits">
+                {sig.pattern.map((g, k) => (
+                  <span key={k} className={`bit${g ? ' on' : ''}`} />
+                ))}
+                <span className="playhead" style={{ animationDuration: `${sig.period}s` }} />
+              </div>
+              <div className="signal-caption">
+                PERIOD {sig.period.toFixed(2)}s · BAND {year === NA_YEAR ? 'UNKNOWN' : year} ·{' '}
+                {sig.echo ? 'ECHOING' : 'LIVE'} SIGNAL
+              </div>
+            </div>
+          )}
           <div className="hint">ESC OR CLICK THE VOID TO RELEASE · CLICK A COHORT STAR TO CHAIN</div>
         </div>
       </aside>
