@@ -193,6 +193,9 @@ export class StarField {
   /** chrome subscribes here: hover / lock / release / sweep / expose / ignite / lockframe */
   readonly events = new EventTarget();
 
+  /** true while a FlightMode instance owns this field; guards hover/label/tag work */
+  flightActive = false;
+
   private points!: THREE.Points;
   private starMat!: THREE.ShaderMaterial;
   private geo!: THREE.BufferGeometry;
@@ -224,6 +227,9 @@ export class StarField {
 
   private v3 = new THREE.Vector3();
   private ray = new THREE.Raycaster();
+
+  /** labels.enabled state saved by beginFlight, restored by endFlight */
+  private _labelsEnabledBeforeFlight = false;
 
   private tags!: ProjectedTagLayer;
   private placardDefs: { center: [number, number, number]; title: string; sub: string }[] = [];
@@ -498,6 +504,7 @@ export class StarField {
 
   private bindPointer(canvas: HTMLCanvasElement) {
     canvas.addEventListener('pointerdown', (e) => {
+      if (this.flightActive) return;
       this.down = { x: e.clientX, y: e.clientY, t: performance.now(), moved: false };
       // stationary hold ⇒ EXPOSE
       this.holdTimer = window.setTimeout(() => {
@@ -506,6 +513,7 @@ export class StarField {
     });
 
     canvas.addEventListener('pointermove', (e) => {
+      if (this.flightActive) return;
       if (this.down) {
         const dx = e.clientX - this.down.x;
         const dy = e.clientY - this.down.y;
@@ -521,6 +529,7 @@ export class StarField {
     });
 
     canvas.addEventListener('pointerup', (e) => {
+      if (this.flightActive) return;
       window.clearTimeout(this.holdTimer);
       const wasExposing = this.exposing;
       if (wasExposing) this.endExpose();
@@ -540,6 +549,7 @@ export class StarField {
     });
 
     canvas.addEventListener('pointerleave', () => {
+      if (this.flightActive) return;
       this.setHover(-1);
     });
   }
@@ -561,6 +571,7 @@ export class StarField {
 
   private onKey = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
+    if (this.flightActive) return; // flight handles its own ESC
     if (this.lockedIndex >= 0) this.release();
     else if ((this.starMat.uniforms.uLensField.value as number) > 0) this.emit('escape', null);
   };
@@ -835,6 +846,60 @@ export class StarField {
     gsap.to(this, { spin: name === 'spiral' ? 1 : 0, duration: dur * 0.5 });
   }
 
+  // ---------- flight hooks ----------
+
+  /** Return the raw layout Float32Array for the named layout.
+   * FlightMode uses this to seed NearBodies with the correct position buffer. */
+  layoutPositionsFor(name: LayoutName): Float32Array {
+    return this.layouts[name];
+  }
+
+  /** Called by FlightMode on launch. Suspends all survey interactivity so the
+   * flight loop can own the scene without interference. */
+  beginFlight(): void {
+    this.flightActive = true;
+    // release any existing star lock silently (no camera tween needed; flight will move it)
+    if (this.lockedIndex >= 0) {
+      this.lockedIndex = -1;
+      this.starMat.uniforms.uLock.value = -1;
+      gsap.to(this.starMat.uniforms.uDim, { value: 0, duration: 0.3 });
+      const lineMat = this.cohortLines.material as THREE.LineBasicMaterial;
+      lineMat.opacity = 0;
+      this.cohortLines.visible = false;
+      (this.cohortAttr.array as Float32Array).fill(0);
+      this.cohortAttr.needsUpdate = true;
+    }
+    this.controls.enabled = false;
+    this._labelsEnabledBeforeFlight = this.labels.enabled;
+    this.labels.setEnabled(false);
+    this.tags.clear();
+    this.markers.group.visible = false;
+    this.spin = 0;
+  }
+
+  /** Called by FlightMode on exit. Restores survey interactivity and tweens the
+   * camera back to the current layout's home preset (mirrors the release() pattern). */
+  endFlight(): void {
+    this.controls.enabled = false; // keep disabled until tween finishes
+    this.labels.setEnabled(this._labelsEnabledBeforeFlight);
+    // restore spin: spiral spins, all others are static (mirrors setLayout)
+    this.spin = this.currentLayout === 'spiral' ? (this.reducedMotion ? 0 : 1) : 0;
+    // markers re-shown only after morph is settled (same as setLayout/release)
+    this.markers.setLayout(this.currentLayout);
+    this.markers.group.visible = true;
+    const preset = CAMERA_PRESETS[this.currentLayout];
+    gsap.to(this.camera.position, {
+      x: preset.pos[0], y: preset.pos[1], z: preset.pos[2],
+      duration: this.dur(1.2), ease: 'power3.inOut',
+    });
+    gsap.to(this.controls.target, {
+      x: preset.target[0], y: preset.target[1], z: preset.target[2],
+      duration: this.dur(1.2), ease: 'power3.inOut',
+      onComplete: () => (this.controls.enabled = true),
+    });
+    this.flightActive = false;
+  }
+
   // ---------- labels ----------
 
   private collectLabelCandidates(): { index: number; x: number; y: number; px: number }[] {
@@ -925,14 +990,14 @@ export class StarField {
     if (this.composer) this.composer.render();
     else this.renderer.render(this.scene, this.camera);
 
-    if (this.labels.enabled && this.frame % 3 === 0 && this.lockedIndex < 0) {
+    if (!this.flightActive && this.labels.enabled && this.frame % 3 === 0 && this.lockedIndex < 0) {
       this.labels.update(this.collectLabelCandidates());
     }
 
-    if (this.frame % 3 === 1) this.updateChartTags();
+    if (!this.flightActive && this.frame % 3 === 1) this.updateChartTags();
 
     // hover picking, throttled; suppressed while exposing or mid-press
-    if (this.frame % 6 === 0 && this.pointerX >= 0 && !this.exposing && !this.down) {
+    if (!this.flightActive && this.frame % 6 === 0 && this.pointerX >= 0 && !this.exposing && !this.down) {
       this.setHover(this.pickAt(this.pointerX, this.pointerY));
     }
 
