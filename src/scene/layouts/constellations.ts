@@ -6,7 +6,7 @@
 import type { StarFields } from '../../data/parser';
 
 // centers chosen so the two giants face off and the dwarfs ring them
-const CENTERS: [number, number, number][] = [
+export const CENTERS: [number, number, number][] = [
   [-150, 0, 0], // Earth-616 (16,345)
   [185, 10, 60], // New Earth (6,829)
   [60, 95, -210], // Earth-One (43)

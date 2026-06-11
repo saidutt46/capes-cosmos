@@ -24,9 +24,11 @@ import { NA_APPEARANCES, NA_YEAR } from '../data/parser';
 import { galaxySpiral, armPoint } from './layouts/spiral';
 import { expandingUniverse } from './layouts/shells';
 import { timeTunnel, TUNNEL_LENGTH } from './layouts/tunnel';
-import { constellations } from './layouts/constellations';
+import { constellations, CENTERS } from './layouts/constellations';
 import { makeBackground, makeCoreGlow, makeWisps } from './nebula';
 import { LabelLayer } from './labels';
+import { ProjectedTagLayer, type PlacedTag } from './tags';
+import { ChartMarkers } from './markers';
 import { GpuPicker } from './picking';
 import type { SweepCensus } from '../data/fieldnotes';
 
@@ -223,6 +225,10 @@ export class StarField {
   private v3 = new THREE.Vector3();
   private ray = new THREE.Raycaster();
 
+  private tags!: ProjectedTagLayer;
+  private placardDefs: { center: [number, number, number]; title: string; sub: string }[] = [];
+  private markers!: ChartMarkers;
+
   /** prefers-reduced-motion: instant ignition, short crossfade morphs, no twinkle/spin */
   readonly reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   /** coarse pointers (phones/tablets): skip post FX, lower DPR cap */
@@ -258,9 +264,17 @@ export class StarField {
     };
 
     this.labels = new LabelLayer(canvas.parentElement ?? document.body);
+    this.tags = new ProjectedTagLayer(canvas.parentElement ?? document.body);
+    this.placardDefs = stars.meta.realities.map((r, k) => ({
+      center: CENTERS[Math.min(k, CENTERS.length - 1)],
+      title: r.name.toUpperCase(),
+      sub: r.count >= 1000 ? `${r.count.toLocaleString()} SOULS` : `DWARF REALITY · ${r.count}`,
+    }));
 
     this.buildAtmosphere();
     this.buildPoints(stars);
+    this.markers = new ChartMarkers();
+    this.points.add(this.markers.group); // inherits field spin like the cohort lines
     this.picker = new GpuPicker(this.geo);
     this.buildPost();
     this.bindPointer(canvas);
@@ -630,6 +644,7 @@ export class StarField {
     if (this.lockedIndex === i) return;
     this.lockedIndex = i;
     this.starMat.uniforms.uLock.value = i;
+    this.markers.group.visible = false;
     gsap.to(this.starMat.uniforms.uDim, { value: 0.68, duration: 0.9 });
 
     // cohort: same universe + same debut year, nearest by index distance
@@ -673,6 +688,7 @@ export class StarField {
     if (this.lockedIndex < 0) return;
     this.lockedIndex = -1;
     this.starMat.uniforms.uLock.value = -1;
+    this.markers.group.visible = true;
     gsap.to(this.starMat.uniforms.uDim, { value: 0, duration: 0.7 });
     const lineMat = this.cohortLines.material as THREE.LineBasicMaterial;
     gsap.to(lineMat, {
@@ -792,13 +808,18 @@ export class StarField {
 
     this.starMat.uniforms.uMix.value = 0;
     this.currentLayout = name;
+    this.markers.group.visible = false;
 
     const preset = CAMERA_PRESETS[name];
     const dur = this.dur(MORPH_SECONDS);
 
     gsap.to(this.starMat.uniforms.uMix, {
       value: 1, duration: dur, ease: 'power2.inOut',
-      onComplete: () => (this.morphing = false),
+      onComplete: () => {
+        this.morphing = false;
+        this.markers.setLayout(name);
+        this.markers.group.visible = true;
+      },
     });
     gsap.to(this.camera.position, { x: preset.pos[0], y: preset.pos[1], z: preset.pos[2], duration: dur, ease: 'power3.inOut' });
     gsap.to(this.controls.target, { x: preset.target[0], y: preset.target[1], z: preset.target[2], duration: dur, ease: 'power3.inOut' });
@@ -831,6 +852,49 @@ export class StarField {
     return out;
   }
 
+  /** placards (constellations) / epoch tags (other layouts) — hidden while
+   * locked or mid-morph so the dossier and the ripple own the stage */
+  private updateChartTags() {
+    const mixDone = (this.starMat.uniforms.uMix.value as number) >= 0.99;
+    if (this.lockedIndex >= 0 || !mixDone) {
+      this.tags.clear();
+      return;
+    }
+    const out: PlacedTag[] = [];
+    const v = this.v3;
+    if (this.currentLayout === 'constellations') {
+      for (const p of this.placardDefs) {
+        v.set(p.center[0], p.center[1], p.center[2]);
+        this.toWorld(v);
+        const dist = v.distanceTo(this.camera.position);
+        v.project(this.camera);
+        if (v.z > 1 || Math.abs(v.x) > 1.05 || Math.abs(v.y) > 1.05) continue;
+        out.push({
+          x: (v.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-v.y * 0.5 + 0.5) * window.innerHeight - 14,
+          opacity: Math.max(0.3, Math.min(0.95, 1.25 - dist / 1400)),
+          title: p.title,
+          sub: p.sub,
+          hairline: true,
+        });
+      }
+    } else {
+      for (const t of this.markers.tagsFor(this.currentLayout)) {
+        v.set(t.pos[0], t.pos[1], t.pos[2]);
+        this.toWorld(v);
+        v.project(this.camera);
+        if (v.z > 1 || Math.abs(v.x) > 1.02 || Math.abs(v.y) > 1.02) continue;
+        out.push({
+          x: (v.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-v.y * 0.5 + 0.5) * window.innerHeight,
+          opacity: 0.7,
+          title: t.title,
+        });
+      }
+    }
+    this.tags.update(out);
+  }
+
   // ---------- frame loop ----------
 
   private onResize = () => {
@@ -861,6 +925,8 @@ export class StarField {
       this.labels.update(this.collectLabelCandidates());
     }
 
+    if (this.frame % 3 === 1) this.updateChartTags();
+
     // hover picking, throttled; suppressed while exposing or mid-press
     if (this.frame % 6 === 0 && this.pointerX >= 0 && !this.exposing && !this.down) {
       this.setHover(this.pickAt(this.pointerX, this.pointerY));
@@ -887,6 +953,7 @@ export class StarField {
     window.removeEventListener('keydown', this.onKey);
     this.controls.dispose();
     this.labels.dispose();
+    this.tags.dispose();
     this.picker.dispose();
     this.composer?.dispose();
     this.scene.traverse((o) => {
