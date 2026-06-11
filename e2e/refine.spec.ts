@@ -5,10 +5,10 @@ test.beforeEach(async ({ page }) => {
   await page.waitForFunction(() => '__paperSky' in window);
 });
 
-test('footer legend is promoted to 14px copy', async ({ page }) => {
+test('footer legend is promoted to 16px copy', async ({ page }) => {
   const legend = page.locator('[data-testid="legend"]');
   await expect(legend).toBeVisible();
-  await expect(legend).toHaveCSS('font-size', '14px');
+  await expect(legend).toHaveCSS('font-size', '16px');
 });
 
 test('lens clear-all appears with an active lens and resets it', async ({ page }) => {
