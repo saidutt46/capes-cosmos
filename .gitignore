@@ -29,3 +29,6 @@ playwright-report/
 # secrets
 .env
 .firecrawl/
+
+# planning docs — local only, never on the public repo
+docs/superpowers/
