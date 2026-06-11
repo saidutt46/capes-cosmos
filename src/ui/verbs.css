@@ -180,18 +180,26 @@
   position: relative;
   display: flex;
   align-items: flex-end;
-  gap: 4px;
-  height: 16px;
+  gap: 2px;
+  height: 24px;
 }
 
+/* full-width waveform: each bar breathes on its own phase */
 .signal-bits .bit {
-  width: 6px;
-  height: 4px;
-  background: color-mix(in srgb, var(--annot) 50%, transparent);
+  flex: 1;
+  min-width: 0;
+  border-radius: 1px 1px 0 0;
+  background: color-mix(in srgb, var(--annot) 45%, transparent);
+  transform-origin: bottom;
+  animation: bit-breathe 1.8s ease-in-out infinite;
 }
 .signal-bits .bit.on {
-  height: 14px;
-  background: var(--coral);
+  background: linear-gradient(to top, var(--coral), color-mix(in srgb, var(--coral) 55%, var(--bone)));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--coral) 35%, transparent);
+}
+@keyframes bit-breathe {
+  0%, 100% { transform: scaleY(0.7); }
+  50% { transform: scaleY(1.08); }
 }
 
 .signal-bits .playhead {
@@ -217,4 +225,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .signal-bits .playhead { animation: none; opacity: 0; }
+  .signal-bits .bit { animation: none; }
 }

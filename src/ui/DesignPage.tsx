@@ -9,7 +9,7 @@ const SWATCHES = [
   { name: 'Ink wash', hex: '#11141A', note: 'HUD plates, +2% over void' },
   { name: 'Newsprint bone', hex: '#E9E2D0', note: 'all primary text' },
   { name: 'Annotation', hex: '#8A8E98', note: 'labels, ticks, designations' },
-  { name: 'Halation Coral', hex: '#FF5C49', note: 'THE accent — interaction only' },
+  { name: 'Halation Coral', hex: '#FF5C49', note: 'THE accent · interaction only' },
 ];
 
 const EMISSIONS = [
@@ -27,12 +27,12 @@ export function DesignPage() {
           FIELD MANUAL
         </h1>
         <p className="mono dim">
-          PAPER SKY — design system v1 · data-noir observatory
+          PAPER SKY · design system v1 · data-noir observatory
         </p>
       </header>
 
       <section>
-        <h2 className="mono section-label">01 · PALETTE — CHROME</h2>
+        <h2 className="mono section-label">01 · PALETTE · CHROME</h2>
         <div className="swatch-row">
           {SWATCHES.map((s) => (
             <figure key={s.hex} className="swatch">
@@ -40,15 +40,15 @@ export function DesignPage() {
               <figcaption className="mono">
                 {s.name}
                 <br />
-                <span className="dim">{s.hex} — {s.note}</span>
+                <span className="dim">{s.hex} · {s.note}</span>
               </figcaption>
             </figure>
           ))}
         </div>
-        <h2 className="mono section-label">01b · EMISSIONS — CANVAS-ONLY</h2>
+        <h2 className="mono section-label">01b · EMISSIONS · CANVAS-ONLY</h2>
         <p className="body rule">
           The law: Marvel red and DC blue exist <em>only as light inside the
-          canvas</em> — data encoding, rendered additive with bloom. UI chrome
+          canvas</em>: data encoding, rendered additive with bloom. UI chrome
           never touches them. Chrome is void, bone, and coral. Break this rule
           and the whole thing collapses into a fan site.
         </p>
@@ -78,7 +78,7 @@ export function DesignPage() {
           <p className="mono spec-mono">
             PS-00001 · SPIDER-MAN (PETER PARKER) · M/1962 · 4,043 OBS
             <br />
-            LUMINOSITY — brighter than 99.996% of the printed sky
+            LUMINOSITY · brighter than 99.996% of the printed sky
           </p>
         </div>
         <div className="specimen">
@@ -101,16 +101,16 @@ export function DesignPage() {
         <div className="ease-demo">
           <div className="ease-dot" />
         </div>
-        <p className="mono dim">cubic-bezier(0.16, 1, 0.3, 1) — var(--ease-weighty)</p>
+        <p className="mono dim">cubic-bezier(0.16, 1, 0.3, 1) · var(--ease-weighty)</p>
       </section>
 
       <section>
         <h2 className="mono section-label">04 · THE FOUR VERBS</h2>
         <ul className="mono verbs">
-          <li><span className="coral">SWEEP</span> — click void → the space answers</li>
-          <li><span className="coral">LOCK</span> — click star → dossier unfolds from its rings</li>
-          <li><span className="coral">EXPOSE</span> — press &amp; hold → the faint sky develops</li>
-          <li><span className="coral">NAVIGATE</span> — dial · expeditions · ⌘K warp</li>
+          <li><span className="coral">SWEEP</span> · click void → the space answers</li>
+          <li><span className="coral">LOCK</span> · click star → dossier unfolds from its rings</li>
+          <li><span className="coral">EXPOSE</span> · press &amp; hold → the faint sky develops</li>
+          <li><span className="coral">NAVIGATE</span> · dial · expeditions · ⌘K warp</li>
         </ul>
       </section>
 

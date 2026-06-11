@@ -64,7 +64,7 @@ export class ChartMarkers {
   constructor() {
     // spiral: dashed decade rings in the galactic plane
     const spiral = new THREE.Group();
-    const spiralTags: EpochTag[] = [{ pos: [0, 3, 0], title: '1935 — FIRST LIGHT' }];
+    const spiralTags: EpochTag[] = [{ pos: [0, 3, 0], title: '1935 · FIRST LIGHT' }];
     for (const y of [1940, 1960, 1980, 2000]) {
       const r = spiralR(y);
       spiral.add(dashedCircle(r, 0.22));
@@ -78,7 +78,7 @@ export class ChartMarkers {
     for (const [y, label] of [
       [1950, '1950'],
       [1985, '1985'],
-      [2013, '2013 — SURVEY RIM'],
+      [2013, '2013 · SURVEY RIM'],
     ] as [number, string][]) {
       const r = shellR(y);
       shells.add(dashedCircle(r, 0.18));

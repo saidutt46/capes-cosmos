@@ -20,6 +20,20 @@
 
 .hud-bottom { align-items: flex-end; }
 
+/* top bar: wordmark left, layout dial dead-center, toggles right */
+.hud-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+}
+.hud-top .dial { justify-self: center; }
+.hud-right {
+  justify-self: end;
+  display: flex;
+  gap: 4px;
+  align-items: baseline;
+}
+
 .wordmark {
   color: var(--bone);
   font-size: 14px;

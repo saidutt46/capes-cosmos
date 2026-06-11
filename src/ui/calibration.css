@@ -18,3 +18,37 @@
   color: var(--coral);
   animation: blink 1.2s steps(1) infinite;
 }
+
+/* decode noise riding ahead of the typing head */
+.cal-scramble {
+  color: var(--coral);
+  opacity: 0.75;
+}
+
+/* chromatic-aberration flicker: the transmission jitters every ~2.8s */
+.calibration {
+  animation: cal-aberrate 2.8s steps(2) infinite;
+}
+@keyframes cal-aberrate {
+  0%, 90% {
+    text-shadow: 0 1px 12px rgba(8, 9, 13, 0.95);
+    transform: translateX(-50%);
+  }
+  93% {
+    text-shadow: -2px 0 var(--coral), 2px 0 #4595ff, 0 1px 12px rgba(8, 9, 13, 0.95);
+    transform: translateX(calc(-50% + 1px));
+  }
+  96% {
+    text-shadow: 2px 0 var(--coral), -2px 0 #4595ff, 0 1px 12px rgba(8, 9, 13, 0.95);
+    transform: translateX(calc(-50% - 1px));
+  }
+  98%, 100% {
+    text-shadow: 0 1px 12px rgba(8, 9, 13, 0.95);
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calibration { animation: none; }
+  .cal-caret { animation: none; }
+}

@@ -112,7 +112,7 @@ export function Verbs({ field, stars, names, onLockChange, radio }: VerbsProps) 
           <div className="line2">{annotate(sweep.census)}</div>
           {sweep.census.brightestIndex >= 0 && names && (
             <div className="line3">
-              BRIGHTEST OBJECT IN RADIUS — {designationOf(sweep.census.brightestIndex)}{' '}
+              BRIGHTEST OBJECT IN RADIUS · {designationOf(sweep.census.brightestIndex)}{' '}
               {names[sweep.census.brightestIndex]?.split(' (')[0]} ·{' '}
               {sweep.census.brightestApp.toLocaleString()} obs
             </div>
@@ -122,7 +122,7 @@ export function Verbs({ field, stars, names, onLockChange, radio }: VerbsProps) 
 
       {expose?.active && (
         <div className="expose-counter" data-testid="expose-counter">
-          EXPOSURE {expose.seconds.toFixed(1)}s —{' '}
+          EXPOSURE {expose.seconds.toFixed(1)}s ·{' '}
           <span className="n">
             {Math.floor(
               faintCount.current * Math.min(1, expose.seconds / 2.4),
@@ -185,6 +185,18 @@ function Dossier({
   const hasApp = app !== NA_APPEARANCES;
   const pct = field.percentileOf(i);
   const sig = radio ? signatureOf(i, stars) : null;
+  // waveform: the 8-step gate pattern carried on two deterministic harmonics,
+  // resampled across the full strip width
+  const WAVE_BARS = 36;
+  const wave = sig
+    ? Array.from({ length: WAVE_BARS }, (_, k) => {
+        const on = sig.pattern[Math.floor((k / WAVE_BARS) * 8)] === 1;
+        const carrier = Math.sin((k / WAVE_BARS) * Math.PI * 6 + sig.freq * 0.05);
+        const harmonic = Math.sin((k / WAVE_BARS) * Math.PI * 14 + sig.period * 5) * 0.35;
+        const h = 0.18 + 0.32 * Math.abs(carrier + harmonic) + (on ? 0.5 : 0.08);
+        return { h: Math.min(1, h), on };
+      })
+    : [];
 
   // cohort size: same debut year, same universe (the whole sky, not just lines)
   let cohortTotal = 0;
@@ -263,15 +275,22 @@ function Dossier({
             <b>{hasApp ? `${app.toLocaleString()} observations` : 'below detection threshold'}</b>
             {hasApp && pct > 0 && (
               <>
-                {' — '}brighter than <b>{pct.toFixed(pct > 99 ? 3 : 1)}%</b> of the printed sky
+                {', '}brighter than <b>{pct.toFixed(pct > 99 ? 3 : 1)}%</b> of the printed sky
               </>
             )}
           </div>
           {sig && (
             <div className="signal" data-testid="signal">
               <div className="signal-bits">
-                {sig.pattern.map((g, k) => (
-                  <span key={k} className={`bit${g ? ' on' : ''}`} />
+                {wave.map((b, k) => (
+                  <span
+                    key={k}
+                    className={`bit${b.on ? ' on' : ''}`}
+                    style={{
+                      height: `${Math.round(b.h * 100)}%`,
+                      animationDelay: `${(k * 0.07).toFixed(2)}s`,
+                    }}
+                  />
                 ))}
                 <span className="playhead" style={{ animationDuration: `${sig.period}s` }} />
               </div>

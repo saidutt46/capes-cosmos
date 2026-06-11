@@ -20,15 +20,15 @@ export function MethodologyPage() {
           <a className="hud-link" href="https://www.kaggle.com/datasets/ibrahimqasimi/marvel-dc-comic-characters-database">
             Marvel + DC Comic Characters Database
           </a>{' '}
-          — itself derived from the FiveThirtyEight comic-characters dataset, compiled
-          from the Marvel and DC fan wikis. Cleaning, analysis, and the binary survey
+          (itself derived from the FiveThirtyEight comic-characters dataset, compiled
+          from the Marvel and DC fan wikis). Cleaning, analysis, and the binary survey
           bundle live in the companion repo{' '}
           <a className="hud-link" href="https://github.com/saidutt46/capes-and-cowls">
             capes-and-cowls
           </a>
           : the two publishers&apos; mutually exclusive year columns were coalesced
           (debut-year coverage rose from ~30% to 96.2%), categorical suffixes
-          normalized, and missing values kept missing — no debut year was ever imputed.
+          normalized, and missing values kept missing; no debut year was ever imputed.
         </p>
       </section>
 
@@ -36,7 +36,7 @@ export function MethodologyPage() {
         <h2 className="mono section-label">02 · WHAT THE SKY ENCODES</h2>
         <p className="body rule">
           Star color is the publisher&apos;s emission (Marvel red / DC blue); deceased
-          characters dim to embers. Size and brightness follow appearance counts — a
+          characters dim to embers. Size and brightness follow appearance counts: a
           power law, so a few suns glare over a vast dust of characters seen once or
           twice. Each star carries a unique identity hue as a ring that resolves only
           up close. The &quot;galaxies&quot; in the Constellations sky are the fictional
@@ -49,7 +49,7 @@ export function MethodologyPage() {
         <h2 className="mono section-label">03 · WHAT IS DELIBERATELY ABSENT</h2>
         <p className="body rule">
           No character artwork, no logos, no cover scans. The dataset is public domain;
-          the characters&apos; likenesses are not — they remain the property of Marvel
+          the characters&apos; likenesses are not; they remain the property of Marvel
           and DC. This survey maps <em>data as light</em>, nothing else. Names and
           facts are uncopyrightable; everything you see is computed from them.
         </p>

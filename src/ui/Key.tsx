@@ -7,8 +7,8 @@ import type { LayoutName } from '../scene/field';
 const TIME_ROW: Record<LayoutName, string> = {
   spiral: 'CORE 1935 → RIM 2013 · TIME WINDS OUTWARD',
   shells: 'INNER SHELL 1935 → OUTER RIM 2013',
-  tunnel: 'DEPTH IS TIME — FLY FORWARD, 1935 → 2013',
-  constellations: 'GROUPED BY REALITY — NOT BY TIME',
+  tunnel: 'DEPTH IS TIME · FLY FORWARD, 1935 → 2013',
+  constellations: 'GROUPED BY REALITY · NOT BY TIME',
 };
 
 export function Key({

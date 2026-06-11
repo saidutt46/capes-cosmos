@@ -49,7 +49,7 @@ test('constellations layout shows reality placards; lock hides them', async ({ p
 test('epoch markers answer "is the center 1900 or 2013"', async ({ page }) => {
   await page.waitForTimeout(3200); // ignition
   const tags = page.locator('[data-testid="chart-tags"]');
-  await expect(tags).toContainText('1935 — FIRST LIGHT'); // spiral default
+  await expect(tags).toContainText('1935 · FIRST LIGHT'); // spiral default
   await expect(tags).toContainText('1980');
 
   await page.click('[data-testid="dial-tunnel"]');

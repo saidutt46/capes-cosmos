@@ -18,11 +18,11 @@ const LAYOUTS: { id: LayoutName; label: string }[] = [
 
 const LEGENDS: Record<LayoutName, string> = {
   spiral:
-    'Eight decades wind outward from the 1935 core — heroes ride above the plane, villains below.',
+    'Eight decades wind outward from the 1935 core; heroes ride above the plane, villains below.',
   shells:
     'The printed big bang: every shell is a year, expanding from 1935 to the 2013 rim.',
   tunnel:
-    'Depth is time. Fly forward through the corridor — it bulges where 1993 minted 763 souls.',
+    'Depth is time. Fly forward through the corridor; it bulges where 1993 minted 763 souls.',
   constellations:
     'The multiverse, mapped honestly: two great galaxies and the dwarf realities that orbit them.',
 };
@@ -45,7 +45,7 @@ interface HudProps {
 export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, lens, onLens, radio, onRadio, radioSupported }: HudProps) {
   return (
     <div className="hud">
-      <header className="hud-bar">
+      <header className="hud-bar hud-top">
         <span className="wordmark" data-testid="wordmark">
           PAPER SKY<span className="cursor">_</span>
         </span>
@@ -63,22 +63,24 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, le
           ))}
         </nav>
 
-        {radioSupported && (
+        <span className="hud-right">
+          {radioSupported && (
+            <button
+              className={`dial-btn names-btn${radio ? ' active' : ''}`}
+              data-testid="radio-toggle"
+              onClick={() => onRadio(!radio)}
+            >
+              RADIO {radio ? 'ON' : 'OFF'}
+            </button>
+          )}
           <button
-            className={`dial-btn names-btn${radio ? ' active' : ''}`}
-            data-testid="radio-toggle"
-            onClick={() => onRadio(!radio)}
+            className={`dial-btn names-btn${names ? ' active' : ''}`}
+            data-testid="names-toggle"
+            onClick={() => onNames(!names)}
           >
-            RADIO {radio ? 'ON' : 'OFF'}
+            DESIGNATIONS {names ? 'ON' : 'OFF'}
           </button>
-        )}
-        <button
-          className={`dial-btn names-btn${names ? ' active' : ''}`}
-          data-testid="names-toggle"
-          onClick={() => onNames(!names)}
-        >
-          DESIGNATIONS {names ? 'ON' : 'OFF'}
-        </button>
+        </span>
       </header>
 
       <nav className="lens-bar" data-testid="lens-bar">
@@ -116,10 +118,10 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, le
       <footer className="hud-bar hud-bottom">
         <span data-testid="status" className="hud-note">
           {error
-            ? `ACQUISITION FAILED — ${error}`
+            ? `ACQUISITION FAILED · ${error}`
             : stars
               ? ignite < 1
-                ? `IGNITING — ${Math.floor(stars.count * ignite).toLocaleString()} OBJECTS`
+                ? `IGNITING · ${Math.floor(stars.count * ignite).toLocaleString()} OBJECTS`
                 : `${stars.count.toLocaleString()} OBJECTS · ${stars.meta.categories.reality.length} REALITIES · 1935–2013`
               : 'ACQUIRING SURVEY DATA…'}
           {'  '}
