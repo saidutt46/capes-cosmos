@@ -80,9 +80,10 @@ export function Calibration({
     };
   }, [active, line, reduced]);
 
-  // any input skips for this visit
+  // any input skips for this visit — register as soon as active (not after first
+  // render cycle sets line to 0) so a fast click never misses the window
   useEffect(() => {
-    if (!active || line < 0 || line >= LINES.length) return;
+    if (!active) return;
     const skip = () => finishRef.current();
     window.addEventListener('pointerdown', skip);
     window.addEventListener('keydown', skip);
@@ -90,7 +91,7 @@ export function Calibration({
       window.removeEventListener('pointerdown', skip);
       window.removeEventListener('keydown', skip);
     };
-  }, [active, line]);
+  }, [active]);
 
   if (!active || line < 0 || line >= LINES.length) return null;
   const decoding = chars > 0 && chars < LINES[line].length;
