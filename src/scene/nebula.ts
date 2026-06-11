@@ -98,8 +98,12 @@ const GLOW_FRAG = /* glsl */ `
     float d = length(vUv) * 2.0;
     float core = exp(-d * 5.5);
     float bloom = exp(-d * 1.8) * 0.35;
+    // window to true zero before the quad edge — additive blending paints any
+    // residual as a hard square at the billboard boundary
+    float win = smoothstep(1.0, 0.62, d);
+    float e = (core + bloom) * win;
     vec3 warm = vec3(1.0, 0.85, 0.62); // old starlight, not UI coral
-    gl_FragColor = vec4(warm * (core + bloom), (core + bloom)) * uFade;
+    gl_FragColor = vec4(warm * e, e) * uFade;
   }
 `;
 
@@ -141,7 +145,7 @@ const WISP_FRAG = /* glsl */ `
   void main() {
     float d = length(gl_PointCoord - 0.5) * 2.0;
     if (d > 1.0) discard;
-    float a = exp(-d * 3.0) * 0.06 * vPulse * uFade;
+    float a = exp(-d * 3.0) * smoothstep(1.0, 0.7, d) * 0.06 * vPulse * uFade;
     gl_FragColor = vec4(vColor, a);
   }
 `;
