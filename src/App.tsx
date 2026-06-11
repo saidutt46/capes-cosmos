@@ -52,6 +52,12 @@ function Survey() {
           }
         });
 
+        // Esc with no lock → clear any active lens (field can't reach React state)
+        f.events.addEventListener('escape', () => {
+          f.setLens({ field: 'none', value: 0 });
+          setLens({ field: 'none', value: 0 });
+        });
+
         const res = await fetch('/data/names.json');
         const data = (await res.json()) as { name: string[] };
         if (cancelled) return;

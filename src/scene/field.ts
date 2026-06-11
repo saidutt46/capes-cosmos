@@ -546,7 +546,9 @@ export class StarField {
   }
 
   private onKey = (e: KeyboardEvent) => {
-    if (e.key === 'Escape' && this.lockedIndex >= 0) this.release();
+    if (e.key !== 'Escape') return;
+    if (this.lockedIndex >= 0) this.release();
+    else if ((this.starMat.uniforms.uLensField.value as number) > 0) this.emit('escape', null);
   };
 
   private setHover(i: number) {

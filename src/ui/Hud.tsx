@@ -70,6 +70,15 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, le
       </header>
 
       <nav className="lens-bar" data-testid="lens-bar">
+        {lens.field !== 'none' && (
+          <button
+            className="dial-btn lens-btn lens-clear"
+            data-testid="lens-clear"
+            onClick={() => onLens({ field: 'none', value: 0 })}
+          >
+            ✕ ALL
+          </button>
+        )}
         {LENSES.map((g) => (
           <span key={g.group} className="lens-group">
             <span className="lens-label">{g.group}</span>
