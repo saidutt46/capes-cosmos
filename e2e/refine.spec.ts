@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('paper-sky:calibrated', '1'));
+  await page.addInitScript(() => localStorage.setItem('paper-sky:quiet', '1'));
   await page.goto('/');
   await page.waitForFunction(() => '__paperSky' in window);
 });
@@ -59,20 +59,18 @@ test('epoch markers answer "is the center 1900 or 2013"', async ({ page }) => {
 });
 
 test.describe('first light', () => {
-  test('calibration types on first visit, skips on input, never returns', async ({ browser }) => {
-    const ctx = await browser.newContext(); // virgin storage
+  test('calibration plays each launch and skips on input', async ({ browser }) => {
+    const ctx = await browser.newContext(); // no quiet flag — real-visitor behavior
     const page = await ctx.newPage();
     await page.goto('/');
     const cal = page.locator('[data-testid="calibration"]');
     await expect(cal).toBeVisible({ timeout: 15_000 }); // appears once ignition completes
 
-    await page.mouse.click(640, 400); // any input skips
+    await page.mouse.click(640, 400); // any input skips this visit
     await expect(cal).toHaveCount(0);
 
-    await page.reload();
-    await page.waitForFunction(() => '__paperSky' in window);
-    await page.waitForTimeout(4500);
-    await expect(cal).toHaveCount(0);
+    await page.reload(); // every launch gets first light again
+    await expect(cal).toBeVisible({ timeout: 15_000 });
     await ctx.close();
   });
 });

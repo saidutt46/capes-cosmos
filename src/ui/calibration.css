@@ -1,13 +1,14 @@
 .calibration {
+  /* top-center: the void above the galaxy is empty at launch — let it speak */
   position: fixed;
   left: 50%;
-  bottom: 18vh;
+  top: 14vh;
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 14;
   font-family: var(--font-mono);
-  font-size: 13px;
-  letter-spacing: 0.22em;
+  font-size: 15px;
+  letter-spacing: 0.24em;
   color: var(--bone);
   text-shadow: 0 1px 12px rgba(8, 9, 13, 0.95);
   white-space: nowrap;

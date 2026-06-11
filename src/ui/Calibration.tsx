@@ -1,6 +1,7 @@
-/** First-light calibration — three typed lines that teach a first-time
- * visitor to read the chart. Shown once (localStorage), skipped by any input,
- * replayable from the KEY chip. pointer-events: none — never blocks the sky. */
+/** First-light calibration — three typed lines that teach a visitor to read
+ * the chart. Plays on every launch (any input skips it for that visit);
+ * replayable from the KEY chip. pointer-events: none — never blocks the sky.
+ * QUIET_FLAG is a test-suite suppression, never set for real visitors. */
 import { useEffect, useRef, useState } from 'react';
 import './calibration.css';
 
@@ -9,7 +10,7 @@ const LINES = [
   'COLOR IS ALLEGIANCE · MARVEL RED · DC BLUE',
   'TIME WINDS OUTWARD — 1935 AT THE CORE, 2013 AT THE RIM',
 ];
-export const CALIBRATED_FLAG = 'paper-sky:calibrated';
+export const QUIET_FLAG = 'paper-sky:quiet';
 const TYPE_MS = 28;
 const HOLD_MS = 1600;
 
@@ -31,7 +32,6 @@ export function Calibration({
 
   const finishRef = useRef(() => {});
   finishRef.current = () => {
-    localStorage.setItem(CALIBRATED_FLAG, '1');
     setLine(LINES.length);
     onDone();
   };
@@ -72,7 +72,7 @@ export function Calibration({
     };
   }, [active, line, reduced]);
 
-  // any input skips permanently
+  // any input skips for this visit
   useEffect(() => {
     if (!active || line < 0 || line >= LINES.length) return;
     const skip = () => finishRef.current();

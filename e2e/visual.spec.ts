@@ -4,7 +4,7 @@ import { test, expect, type Page } from '@playwright/test';
  * by eye (and by the agent) without a human in the loop. */
 
 async function loaded(page: Page) {
-  await page.addInitScript(() => localStorage.setItem('paper-sky:calibrated', '1'));
+  await page.addInitScript(() => localStorage.setItem('paper-sky:quiet', '1'));
   await page.goto('/');
   await expect(page.getByTestId('status')).toContainText('23,272 OBJECTS', {
     timeout: 15_000,

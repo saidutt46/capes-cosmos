@@ -15,7 +15,7 @@ declare global {
 }
 
 async function ready(page: Page) {
-  await page.addInitScript(() => localStorage.setItem('paper-sky:calibrated', '1'));
+  await page.addInitScript(() => localStorage.setItem('paper-sky:quiet', '1'));
   await page.goto('/');
   await expect(page.getByTestId('status')).toContainText('23,272 OBJECTS', {
     timeout: 20_000,
@@ -83,7 +83,7 @@ test('LOCK: dossier unfolds, deep-links, chains, releases', async ({ page }) => 
 });
 
 test('DEEP LINK: /star/PS-00001 locks Spider-Man on load', async ({ page }) => {
-  await page.addInitScript(() => localStorage.setItem('paper-sky:calibrated', '1'));
+  await page.addInitScript(() => localStorage.setItem('paper-sky:quiet', '1'));
   await page.goto('/star/PS-00001');
   await expect(page.getByTestId('status')).toContainText('23,272 OBJECTS', {
     timeout: 20_000,

@@ -3,7 +3,7 @@ import { loadSurvey, type StarFields } from './data/parser';
 import { StarField, type LayoutName, type Lens } from './scene/field';
 import { Hud } from './ui/Hud';
 import { Verbs, designationOf } from './ui/Verbs';
-import { Calibration, CALIBRATED_FLAG } from './ui/Calibration';
+import { Calibration, QUIET_FLAG } from './ui/Calibration';
 import { Key } from './ui/Key';
 import { DesignPage } from './ui/DesignPage';
 import { MethodologyPage } from './ui/MethodologyPage';
@@ -34,7 +34,7 @@ function Survey() {
   const [lens, setLens] = useState<Lens>({ field: 'none', value: 0 });
   const [ignite, setIgnite] = useState(0);
   const igniteRef = useRef(0);
-  const [calibRun, setCalibRun] = useState(() => !localStorage.getItem(CALIBRATED_FLAG));
+  const [calibRun, setCalibRun] = useState(() => !localStorage.getItem(QUIET_FLAG));
 
   useEffect(() => {
     let cancelled = false;
@@ -116,10 +116,7 @@ function Survey() {
       />
       <Key
         layout={layout}
-        onRecalibrate={() => {
-          localStorage.removeItem(CALIBRATED_FLAG);
-          setCalibRun(true);
-        }}
+        onRecalibrate={() => setCalibRun(true)}
       />
       <Calibration ignite={ignite} run={calibRun} onDone={() => setCalibRun(false)} />
       {field && stars && (
