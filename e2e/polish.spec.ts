@@ -3,6 +3,7 @@ import { test, expect, type Page } from '@playwright/test';
 /** P3 suite — lenses, methodology, reduced-motion. */
 
 async function ready(page: Page) {
+  await page.addInitScript(() => localStorage.setItem('paper-sky:calibrated', '1'));
   await page.goto('/');
   await expect(page.getByTestId('status')).toContainText('23,272 OBJECTS', {
     timeout: 20_000,
@@ -41,6 +42,7 @@ test('METHODOLOGY: colophon page linked from HUD', async ({ page }) => {
 test('REDUCED MOTION: instant ignition, fully functional', async ({ browser }) => {
   const ctx = await browser.newContext({ reducedMotion: 'reduce' });
   const page = await ctx.newPage();
+  await page.addInitScript(() => localStorage.setItem('paper-sky:calibrated', '1'));
   await page.goto('/');
   // no 2.6s ignition cascade — full count immediately after load
   await expect(page.getByTestId('status')).toContainText('23,272 OBJECTS', {

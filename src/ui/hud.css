@@ -211,3 +211,71 @@
   .glitch { animation: none; }
   .glitch::before, .glitch::after { display: none; }
 }
+
+/* ---- KEY chip (bottom-left, above the status line) ---- */
+
+.key {
+  position: fixed;
+  left: 24px;
+  bottom: 56px;
+  z-index: 13;
+  pointer-events: auto;
+  font-family: var(--font-mono);
+}
+
+.key-btn { font-size: 10px; letter-spacing: 0.26em; }
+
+.key-panel {
+  position: absolute;
+  left: 0;
+  bottom: 34px;
+  width: 280px;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--ink) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--annot) 30%, transparent);
+  backdrop-filter: blur(6px);
+  animation: lens-clear-in 150ms ease;
+}
+
+.key-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--annot);
+  padding: 5px 0;
+}
+
+.swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+.swatch.marvel { background: #ff4438; }
+.swatch.dc { background: #4595ff; margin-left: 12px; }
+
+.ramp { display: flex; align-items: flex-end; gap: 3px; flex: none; }
+.ramp i {
+  display: block;
+  border-radius: 50%;
+  background: var(--bone);
+  opacity: 0.8;
+}
+.ramp i:nth-child(1) { width: 3px; height: 3px; }
+.ramp i:nth-child(2) { width: 6px; height: 6px; }
+.ramp i:nth-child(3) { width: 10px; height: 10px; }
+
+.key-recal {
+  margin-top: 8px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--coral);
+}
+.key-recal:hover { color: var(--bone); }

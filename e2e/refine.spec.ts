@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('paper-sky:calibrated', '1'));
   await page.goto('/');
   await page.waitForFunction(() => '__paperSky' in window);
 });
@@ -55,4 +56,35 @@ test('epoch markers answer "is the center 1900 or 2013"', async ({ page }) => {
   await page.waitForTimeout(2800);
   await expect(tags).toContainText('1990');
   await expect(tags).not.toContainText('FIRST LIGHT');
+});
+
+test.describe('first light', () => {
+  test('calibration types on first visit, skips on input, never returns', async ({ browser }) => {
+    const ctx = await browser.newContext(); // virgin storage
+    const page = await ctx.newPage();
+    await page.goto('/');
+    const cal = page.locator('[data-testid="calibration"]');
+    await expect(cal).toBeVisible({ timeout: 15_000 }); // appears once ignition completes
+
+    await page.mouse.click(640, 400); // any input skips
+    await expect(cal).toHaveCount(0);
+
+    await page.reload();
+    await page.waitForFunction(() => '__paperSky' in window);
+    await page.waitForTimeout(4500);
+    await expect(cal).toHaveCount(0);
+    await ctx.close();
+  });
+});
+
+test('KEY chip explains the chart and tracks the layout', async ({ page }) => {
+  await page.click('[data-testid="key-toggle"]');
+  const panel = page.locator('[data-testid="key-panel"]');
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('MARVEL');
+  await expect(panel).toContainText('APPEARANCES');
+  await expect(page.locator('[data-testid="key-time"]')).toContainText('CORE 1935');
+
+  await page.click('[data-testid="dial-tunnel"]');
+  await expect(page.locator('[data-testid="key-time"]')).toContainText('DEPTH IS TIME');
 });

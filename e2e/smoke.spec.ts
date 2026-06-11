@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('survey loads: wordmark, data acquisition, canvas', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('paper-sky:calibrated', '1'));
   await page.goto('/');
 
   await expect(page.getByTestId('wordmark')).toContainText('PAPER SKY');
@@ -18,6 +19,7 @@ test('survey loads: wordmark, data acquisition, canvas', async ({ page }) => {
 });
 
 test('design page is reachable but hidden', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('paper-sky:calibrated', '1'));
   await page.goto('/design');
   await expect(page.getByTestId('design-title')).toContainText('FIELD MANUAL');
 

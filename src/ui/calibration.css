@@ -1,0 +1,19 @@
+.calibration {
+  position: fixed;
+  left: 50%;
+  bottom: 18vh;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 14;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  color: var(--bone);
+  text-shadow: 0 1px 12px rgba(8, 9, 13, 0.95);
+  white-space: nowrap;
+}
+
+.cal-caret {
+  color: var(--coral);
+  animation: blink 1.2s steps(1) infinite;
+}
