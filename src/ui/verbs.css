@@ -227,3 +227,37 @@
   .signal-bits .playhead { animation: none; opacity: 0; }
   .signal-bits .bit { animation: none; }
 }
+
+/* ---- binary companion ---- */
+.companion { margin-top: 14px; border-top: 1px solid color-mix(in srgb, var(--annot) 22%, transparent); padding-top: 12px; }
+
+.companion-find,
+.companion-traverse {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--coral) 40%, transparent);
+  color: var(--coral);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+.companion-find:hover,
+.companion-traverse:hover {
+  background: color-mix(in srgb, var(--coral) 14%, transparent);
+  color: var(--bone);
+}
+
+.companion-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.26em; color: var(--annot); }
+.companion-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  color: var(--bone);
+  margin: 4px 0 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.companion-uni { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; color: var(--annot); }
+.companion-meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; color: var(--annot); margin-bottom: 8px; }

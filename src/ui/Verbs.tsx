@@ -184,6 +184,18 @@ function Dossier({
   const app = stars.appearances[i];
   const hasApp = app !== NA_APPEARANCES;
   const pct = field.percentileOf(i);
+  const [twin, setTwin] = useState<{ index: number; separation: number } | null>(null);
+  useEffect(() => {
+    setTwin(null); // reset when the locked star changes
+    field.hideBinary();
+  }, [field, i]);
+
+  const findCompanion = () => {
+    const t = field.binaryOf(i);
+    if (!t) return;
+    setTwin(t);
+    field.showBinary(i, t.index);
+  };
   const sig = radio ? signatureOf(i, stars) : null;
   // waveform: the 8-step gate pattern carried on two deterministic harmonics,
   // resampled across the full strip width
@@ -300,6 +312,33 @@ function Dossier({
               </div>
             </div>
           )}
+          <div className="companion">
+            {!twin ? (
+              <button className="companion-find" data-testid="find-companion" onClick={findCompanion}>
+                ◇ FIND BINARY COMPANION
+              </button>
+            ) : (
+              <div className="companion-card" data-testid="companion-card">
+                <div className="companion-label">BINARY SYSTEM</div>
+                <div className="companion-name">
+                  {(names[twin.index] ?? '').split(' (')[0]}
+                  <span className="companion-uni">
+                    {stars.universe[twin.index] === 0 ? 'MARVEL' : 'DC'}
+                  </span>
+                </div>
+                <div className="companion-meta">
+                  {designationOf(twin.index)} · SEPARATION {twin.separation.toFixed(3)}
+                </div>
+                <button
+                  className="companion-traverse"
+                  data-testid="companion-traverse"
+                  onClick={() => field.warpTo(twin.index)}
+                >
+                  TRAVERSE →
+                </button>
+              </div>
+            )}
+          </div>
           <div className="hint">ESC OR CLICK THE VOID TO RELEASE · CLICK A COHORT STAR TO CHAIN</div>
         </div>
       </aside>
