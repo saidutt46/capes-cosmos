@@ -31,6 +31,7 @@ import { ProjectedTagLayer, type PlacedTag } from './tags';
 import { ChartMarkers } from './markers';
 import { GpuPicker } from './picking';
 import type { SweepCensus } from '../data/fieldnotes';
+import { twinOf, type TwinResult } from '../data/twins';
 
 const MARVEL = new THREE.Color('#ff4438');
 const DC = new THREE.Color('#4595ff');
@@ -202,6 +203,8 @@ export class StarField {
   private glow!: THREE.Mesh;
   private picker!: GpuPicker;
   private cohortLines!: THREE.LineSegments;
+  private binaryLine!: THREE.Line;
+  private binaryCache = new Map<number, TwinResult | null>();
   private clock = new THREE.Clock();
   private raf = 0;
   private frame = 0;
@@ -413,6 +416,14 @@ export class StarField {
     this.cohortLines = new THREE.LineSegments(lineGeo, lineMat);
     this.cohortLines.visible = false;
     this.points.add(this.cohortLines); // child of points → inherits field rotation
+
+    const binGeo = new THREE.BufferGeometry();
+    binGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(33 * 3), 3));
+    const binMat = new THREE.LineBasicMaterial({ color: '#ff5c49', transparent: true, opacity: 0 });
+    this.binaryLine = new THREE.Line(binGeo, binMat);
+    this.binaryLine.visible = false;
+    this.binaryLine.frustumCulled = false;
+    this.points.add(this.binaryLine); // inherits field spin
 
     // percentile support: appearances sorted desc, once
     this.sortedApps = Float64Array.from(stars.appearances).filter(
@@ -647,6 +658,7 @@ export class StarField {
 
   lock(i: number) {
     if (this.lockedIndex === i) return;
+    this.hideBinary();
     this.lockedIndex = i;
     this.starMat.uniforms.uLock.value = i;
     this.markers.group.visible = false;
@@ -701,6 +713,7 @@ export class StarField {
       duration: 0.4,
       onComplete: () => (this.cohortLines.visible = false),
     });
+    this.hideBinary();
     (this.cohortAttr.array as Float32Array).fill(0);
     this.cohortAttr.needsUpdate = true;
 
@@ -744,6 +757,7 @@ export class StarField {
     const mid = this.controls.target.clone().lerp(target, 0.5);
 
     this.emit('warp', { index });
+    this.hideBinary();
     this.controls.enabled = false;
     // un-dim and drop the old cohort lines as we pull out
     gsap.to(this.starMat.uniforms.uDim, { value: 0, duration: 0.6 });
@@ -764,6 +778,46 @@ export class StarField {
     // Phase B: sweep the target toward frame center before lock's fly-in takes over
     tl.to(this.controls.target, { x: target.x, y: target.y, z: target.z, duration: 0.7, ease: 'power1.inOut' }, 0.7);
     this.warpTl = tl;
+  }
+
+  /** memoized statistical twin for star i (null if none) */
+  binaryOf(index: number): TwinResult | null {
+    if (this.binaryCache.has(index)) return this.binaryCache.get(index)!;
+    const t = twinOf(index, this.stars, (k) => this.percentileOf(k));
+    this.binaryCache.set(index, t);
+    return t;
+  }
+
+  /** draw a lifted arc across the void from one star to its twin */
+  showBinary(fromIndex: number, toIndex: number) {
+    const a = this.evalPosition(fromIndex, new THREE.Vector3());
+    const b = this.evalPosition(toIndex, new THREE.Vector3());
+    const mid = a.clone().add(b).multiplyScalar(0.5);
+    mid.y += a.distanceTo(b) * 0.18; // lift the arc off the chord
+    const arr = this.binaryLine.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const data = arr.array as Float32Array;
+    const p = new THREE.Vector3();
+    for (let k = 0; k <= 32; k++) {
+      const t = k / 32;
+      const u = 1 - t;
+      p.copy(a).multiplyScalar(u * u)
+        .addScaledVector(mid, 2 * u * t)
+        .addScaledVector(b, t * t);
+      data[k * 3] = p.x; data[k * 3 + 1] = p.y; data[k * 3 + 2] = p.z;
+    }
+    arr.needsUpdate = true;
+    this.binaryLine.geometry.computeBoundingSphere();
+    this.binaryLine.visible = true;
+    const m = this.binaryLine.material as THREE.LineBasicMaterial;
+    gsap.killTweensOf(m);
+    m.opacity = 0;
+    gsap.to(m, { opacity: 0.5, duration: this.dur(0.8) });
+  }
+
+  hideBinary() {
+    const m = this.binaryLine.material as THREE.LineBasicMaterial;
+    gsap.killTweensOf(m);
+    gsap.to(m, { opacity: 0, duration: this.dur(0.3), onComplete: () => (this.binaryLine.visible = false) });
   }
 
   private findCohort(i: number): number[] {
@@ -1000,6 +1054,7 @@ export class StarField {
 
   dispose() {
     this.warpTl?.kill();
+    this.binaryCache.clear();
     cancelAnimationFrame(this.raf);
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('keydown', this.onKey);
@@ -1009,7 +1064,7 @@ export class StarField {
     this.picker.dispose();
     this.composer?.dispose();
     this.scene.traverse((o) => {
-      if (o instanceof THREE.Mesh || o instanceof THREE.Points || o instanceof THREE.LineSegments) {
+      if (o instanceof THREE.Mesh || o instanceof THREE.Points || o instanceof THREE.LineSegments || o instanceof THREE.Line) {
         o.geometry.dispose();
         (o.material as THREE.Material).dispose();
       }
