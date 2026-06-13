@@ -221,6 +221,7 @@ export class StarField {
   private exposeStart = 0;
   private down: { x: number; y: number; t: number; moved: boolean } | null = null;
   private holdTimer = 0;
+  private warpTl: gsap.core.Timeline | null = null;
 
   private v3 = new THREE.Vector3();
   private ray = new THREE.Raycaster();
@@ -719,6 +720,52 @@ export class StarField {
     this.emit('release', null);
   }
 
+  /** Fly to a star from anywhere. Free view → normal lock fly-in. Locked on a
+   * different star → survey slew (arc up, sweep across, dive in). Same star →
+   * noop. Always ends in the same state as lock(index). */
+  warpTo(index: number) {
+    if (index < 0 || index >= this.stars.count) return;
+    if (this.lockedIndex === index) return;
+    this.warpTl?.kill();
+    this.warpTl = null;
+
+    // from free view: the existing fly-in already feels right
+    if (this.lockedIndex < 0 || this.reducedMotion) {
+      this.lock(index);
+      return;
+    }
+
+    // locked elsewhere → survey slew. Drop the current lock visuals first.
+    const target = this.evalPosition(index, new THREE.Vector3());
+    this.toWorld(target);
+    const preset = CAMERA_PRESETS[this.currentLayout];
+    const apex = this.camera.position.clone().lerp(target, 0.4);
+    apex.y = Math.max(apex.y, preset.pos[1] + 140);
+    const mid = this.controls.target.clone().lerp(target, 0.5);
+
+    this.emit('warp', { index });
+    this.controls.enabled = false;
+    // un-dim and drop the old cohort lines as we pull out
+    gsap.to(this.starMat.uniforms.uDim, { value: 0, duration: 0.6 });
+    const lineMat = this.cohortLines.material as THREE.LineBasicMaterial;
+    gsap.to(lineMat, { opacity: 0, duration: 0.4, onComplete: () => (this.cohortLines.visible = false) });
+    this.lockedIndex = -1;
+    this.starMat.uniforms.uLock.value = -1;
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        this.warpTl = null;
+        this.lock(index); // re-frames, re-dims, re-emits 'lock' → dossier unfolds
+      },
+    });
+    // Phase A: arc up to survey altitude
+    tl.to(this.camera.position, { x: apex.x, y: apex.y, z: apex.z, duration: 0.9, ease: 'power2.out' }, 0);
+    tl.to(this.controls.target, { x: mid.x, y: mid.y, z: mid.z, duration: 0.9, ease: 'power2.out' }, 0);
+    // Phase B: sweep the target toward frame center before lock's fly-in takes over
+    tl.to(this.controls.target, { x: target.x, y: target.y, z: target.z, duration: 0.7, ease: 'power1.inOut' }, 0.7);
+    this.warpTl = tl;
+  }
+
   private findCohort(i: number): number[] {
     const year = this.stars.year[i];
     const uni = this.stars.universe[i];
@@ -952,6 +999,7 @@ export class StarField {
   };
 
   dispose() {
+    this.warpTl?.kill();
     cancelAnimationFrame(this.raf);
     window.removeEventListener('resize', this.onResize);
     window.removeEventListener('keydown', this.onKey);
