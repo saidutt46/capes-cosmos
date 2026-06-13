@@ -32,3 +32,4 @@ playwright-report/
 
 # planning docs — local only, never on the public repo
 docs/superpowers/
+scripts/

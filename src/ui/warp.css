@@ -1,0 +1,74 @@
+.warp-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 18vh;
+  background: color-mix(in srgb, var(--void) 35%, transparent);
+  pointer-events: auto;
+}
+
+.warp-panel {
+  width: min(560px, 92vw);
+  background: color-mix(in srgb, var(--ink) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--annot) 35%, transparent);
+  backdrop-filter: blur(8px);
+  padding: 16px 18px 12px;
+  animation: lens-clear-in 150ms ease;
+}
+
+.warp-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--bone);
+  font-family: var(--font-mono);
+  font-size: 18px;
+  letter-spacing: 0.12em;
+  caret-color: var(--coral);
+  padding: 4px 0 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--annot) 30%, transparent);
+}
+.warp-input::placeholder { color: var(--annot); opacity: 0.6; }
+
+.warp-head {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--annot);
+  padding: 10px 0 6px;
+}
+
+.warp-results { list-style: none; margin: 0; padding: 0; }
+
+.warp-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 8px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  border: 1px solid transparent;
+}
+.warp-row.active {
+  background: color-mix(in srgb, var(--coral) 10%, transparent);
+  border-color: color-mix(in srgb, var(--coral) 35%, transparent);
+}
+
+.warp-dot { width: 7px; height: 7px; border-radius: 50%; align-self: center; }
+.warp-dot.marvel { background: #ff4438; }
+.warp-dot.dc { background: #4595ff; }
+
+.warp-name { color: var(--bone); font-size: 14px; letter-spacing: 0.04em; }
+.warp-name mark { background: transparent; color: var(--coral); }
+.warp-desig { color: var(--annot); font-size: 10px; letter-spacing: 0.1em; }
+.warp-stat { color: var(--annot); font-size: 10px; opacity: 0.8; white-space: nowrap; }
+.warp-fly { color: var(--coral); font-size: 9px; letter-spacing: 0.18em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .warp-panel { animation: none; }
+}

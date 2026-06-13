@@ -3,6 +3,7 @@ import { loadSurvey, type StarFields } from './data/parser';
 import { StarField, type LayoutName, type Lens } from './scene/field';
 import { Hud } from './ui/Hud';
 import { Verbs, designationOf } from './ui/Verbs';
+import { WarpSearch } from './ui/WarpSearch';
 import { Calibration, QUIET_FLAG } from './ui/Calibration';
 import { Key } from './ui/Key';
 import { DesignPage } from './ui/DesignPage';
@@ -34,6 +35,7 @@ function Survey() {
   const [error, setError] = useState<string | null>(null);
   const [layout, setLayout] = useState<LayoutName>('spiral');
   const [showNames, setShowNames] = useState(true);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [lens, setLens] = useState<Lens>({ field: 'none', value: 0 });
   const [ignite, setIgnite] = useState(0);
   const igniteRef = useRef(0);
@@ -123,6 +125,17 @@ function Survey() {
     };
   }, []);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchOpen((o) => !o);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const onLayout = useCallback((l: LayoutName) => {
     fieldRef.current?.setLayout(l);
     setLayout(l);
@@ -141,6 +154,10 @@ function Survey() {
   const onLockChange = useCallback((index: number) => {
     const path = index >= 0 ? `/star/${designationOf(index)}` : '/';
     if (window.location.pathname !== path) window.history.pushState(null, '', path);
+  }, []);
+
+  const onWarp = useCallback((index: number) => {
+    fieldRef.current?.warpTo(index);
   }, []);
 
   // radio: locked star broadcasts; sweeps answer as a chord
@@ -187,6 +204,7 @@ function Survey() {
         radio={radio}
         onRadio={onRadio}
         radioSupported={RadioBand.supported}
+        onSearch={() => setSearchOpen(true)}
       />
       <Key
         layout={layout}
@@ -195,6 +213,14 @@ function Survey() {
       <Calibration ignite={ignite} run={calibRun} onDone={() => setCalibRun(false)} />
       {field && stars && (
         <Verbs field={field} stars={stars} names={names} onLockChange={onLockChange} radio={radio} />
+      )}
+      {searchOpen && field && stars && names && (
+        <WarpSearch
+          stars={stars}
+          names={names}
+          onWarp={onWarp}
+          onClose={() => setSearchOpen(false)}
+        />
       )}
     </>
   );
