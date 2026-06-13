@@ -318,3 +318,6 @@
   color: var(--coral);
 }
 .key-recal:hover { color: var(--bone); }
+
+.warp-chip { color: var(--annot); letter-spacing: 0.18em; }
+.warp-chip:hover { color: var(--coral); }

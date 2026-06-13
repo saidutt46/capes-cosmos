@@ -41,9 +41,10 @@ interface HudProps {
   radio: boolean;
   onRadio: (on: boolean) => void;
   radioSupported: boolean;
+  onSearch: () => void;
 }
 
-export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, lens, onLens, radio, onRadio, radioSupported }: HudProps) {
+export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, lens, onLens, radio, onRadio, radioSupported, onSearch }: HudProps) {
   return (
     <div className="hud">
       <header className="hud-bar hud-top">
@@ -68,6 +69,13 @@ export function Hud({ stars, error, layout, onLayout, names, onNames, ignite, le
         </nav>
 
         <span className="hud-right">
+          <button
+            className="dial-btn names-btn warp-chip"
+            data-testid="warp-toggle"
+            onClick={onSearch}
+          >
+            ⌘K SEARCH
+          </button>
           {radioSupported && (
             <button
               className={`dial-btn names-btn${radio ? ' active' : ''}`}
